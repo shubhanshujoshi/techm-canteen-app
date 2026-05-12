@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 from datetime import datetime
 import json
 import os
@@ -10,9 +9,105 @@ import os
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
-    page_icon="🍽️",
+    page_icon="🔺",
     layout="wide"
 )
+
+# ---------------------------------------------------
+# CUSTOM CSS - TECH MAHINDRA THEME
+# ---------------------------------------------------
+
+st.markdown("""
+<style>
+
+/* Main Background */
+
+.stApp {
+    background-color: #f8f8f8;
+}
+
+/* Header */
+
+.main-title {
+    color: #D71920;
+    font-size: 42px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.sub-title {
+    color: #555555;
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+/* Top Rated Section */
+
+.top-rated-box {
+    background-color: white;
+    padding: 18px;
+    border-radius: 15px;
+    border-left: 8px solid #D71920;
+    margin-bottom: 15px;
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.08);
+}
+
+/* Food Cards */
+
+.food-card {
+    background-color: white;
+    padding: 18px;
+    border-radius: 18px;
+    border-top: 6px solid #D71920;
+    margin-bottom: 20px;
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.08);
+}
+
+/* Vendor Tabs */
+
+.stTabs [data-baseweb="tab"] {
+    font-size: 18px;
+    font-weight: 600;
+    color: #D71920;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: #D71920 !important;
+    color: white !important;
+    border-radius: 10px;
+}
+
+/* Buttons */
+
+.stButton>button {
+    background-color: #D71920;
+    color: white;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+}
+
+.stButton>button:hover {
+    background-color: #a51218;
+    color: white;
+}
+
+/* Sidebar */
+
+section[data-testid="stSidebar"] {
+    background-color: #ffffff;
+}
+
+/* Search Box */
+
+.stTextInput>div>div>input {
+    border: 2px solid #D71920;
+    border-radius: 10px;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------
 # DATA FILE
@@ -25,36 +120,140 @@ DATA_FILE = "ratings_data.json"
 # ---------------------------------------------------
 
 default_data = {
+
     "Breakfast": {
-        "Vendor A": ["Poha", "Upma", "Tea", "Coffee", "Sandwich"],
-        "Vendor B": ["Idli", "Dosa", "Coffee", "Vada"],
-        "Vendor C": ["Paratha", "Curd", "Tea"],
-        "Vendor D": ["Bread Omelette", "Boiled Eggs", "Tea"],
-        "Vendor E": ["Cornflakes", "Milk", "Banana Shake"]
+
+        "Vendor A": [
+            "Poha",
+            "Upma",
+            "Tea",
+            "Coffee",
+            "Sandwich"
+        ],
+
+        "Vendor B": [
+            "Idli",
+            "Dosa",
+            "Coffee",
+            "Vada"
+        ],
+
+        "Vendor C": [
+            "Paratha",
+            "Curd",
+            "Tea"
+        ],
+
+        "Vendor D": [
+            "Bread Omelette",
+            "Boiled Eggs",
+            "Tea"
+        ],
+
+        "Vendor E": [
+            "Cornflakes",
+            "Milk",
+            "Banana Shake"
+        ]
     },
 
     "Lunch": {
-        "Vendor A": ["Dal Rice", "Paneer Butter Masala", "Roti"],
-        "Vendor B": ["Biryani", "Raita", "Cold Drink"],
-        "Vendor C": ["Rajma Chawal", "Salad", "Papad"],
-        "Vendor D": ["Fried Rice", "Manchurian", "Noodles"],
-        "Vendor E": ["Chicken Curry", "Jeera Rice", "Roti"]
+
+        "Vendor A": [
+            "Dal Rice",
+            "Paneer Butter Masala",
+            "Roti"
+        ],
+
+        "Vendor B": [
+            "Biryani",
+            "Raita",
+            "Cold Drink"
+        ],
+
+        "Vendor C": [
+            "Rajma Chawal",
+            "Salad",
+            "Papad"
+        ],
+
+        "Vendor D": [
+            "Fried Rice",
+            "Manchurian",
+            "Noodles"
+        ],
+
+        "Vendor E": [
+            "Chicken Curry",
+            "Jeera Rice",
+            "Roti"
+        ]
     },
 
     "Snacks": {
-        "Vendor A": ["Samosa", "Tea", "Coffee"],
-        "Vendor B": ["Puff", "Cold Coffee", "Burger"],
-        "Vendor C": ["Momos", "Spring Roll", "Tea"],
-        "Vendor D": ["French Fries", "Pizza Slice", "Pepsi"],
-        "Vendor E": ["Pasta", "Garlic Bread", "Milkshake"]
+
+        "Vendor A": [
+            "Samosa",
+            "Tea",
+            "Coffee"
+        ],
+
+        "Vendor B": [
+            "Puff",
+            "Cold Coffee",
+            "Burger"
+        ],
+
+        "Vendor C": [
+            "Momos",
+            "Spring Roll",
+            "Tea"
+        ],
+
+        "Vendor D": [
+            "French Fries",
+            "Pizza Slice",
+            "Pepsi"
+        ],
+
+        "Vendor E": [
+            "Pasta",
+            "Garlic Bread",
+            "Milkshake"
+        ]
     },
 
     "Dinner": {
-        "Vendor A": ["Dal Tadka", "Roti", "Rice"],
-        "Vendor B": ["Kadhai Paneer", "Naan", "Lassi"],
-        "Vendor C": ["Khichdi", "Curd", "Pickle"],
-        "Vendor D": ["Hakka Noodles", "Soup", "Manchurian"],
-        "Vendor E": ["Butter Chicken", "Rice", "Roti"]
+
+        "Vendor A": [
+            "Dal Tadka",
+            "Roti",
+            "Rice"
+        ],
+
+        "Vendor B": [
+            "Kadhai Paneer",
+            "Naan",
+            "Lassi"
+        ],
+
+        "Vendor C": [
+            "Khichdi",
+            "Curd",
+            "Pickle"
+        ],
+
+        "Vendor D": [
+            "Hakka Noodles",
+            "Soup",
+            "Manchurian"
+        ],
+
+        "Vendor E": [
+            "Butter Chicken",
+            "Rice",
+            "Roti"
+        ]
     }
 }
 
@@ -136,24 +335,30 @@ current_meal = get_current_meal()
 # HEADER
 # ---------------------------------------------------
 
-st.title("🍽️ Tech Mahindra Smart Canteen")
+st.markdown(
+    '<div class="main-title">🔺 Tech Mahindra Smart Canteen</div>',
+    unsafe_allow_html=True
+)
 
-st.subheader(f"Currently Serving: {current_meal}")
+st.markdown(
+    f'<div class="sub-title">Currently Serving: {current_meal}</div>',
+    unsafe_allow_html=True
+)
 
 # ---------------------------------------------------
-# SEARCH BAR
+# SEARCH
 # ---------------------------------------------------
 
 search_query = st.text_input(
     "🔍 Search Food Item",
-    placeholder="Search for dosa, biryani, tea..."
+    placeholder="Search dosa, biryani, tea..."
 )
 
 # ---------------------------------------------------
-# SIDEBAR FILTER
+# SIDEBAR
 # ---------------------------------------------------
 
-st.sidebar.title("Meal Filters")
+st.sidebar.title("🍽 Meal Filters")
 
 selected_meal = st.sidebar.selectbox(
     "Select Meal Time",
@@ -164,7 +369,7 @@ selected_meal = st.sidebar.selectbox(
 meal_data = default_data[selected_meal]
 
 # ---------------------------------------------------
-# TOP 5 HIGHEST RATED
+# TOP RATED SECTION
 # ---------------------------------------------------
 
 st.markdown("## 🏆 Top 5 Highest Rated Dishes")
@@ -207,11 +412,19 @@ for idx, dish in enumerate(top_5, start=1):
 
     st.markdown(
         f"""
-        ### #{idx} 🍽️ {dish['Food']}
-        🏪 Vendor: {dish['Vendor']}  
-        {stars} ({dish['Rating']}/5)  
-        👥 Votes: {dish['Votes']}
-        """
+        <div class="top-rated-box">
+
+        <h3>#{idx} 🍽️ {dish['Food']}</h3>
+
+        <p><b>Vendor:</b> {dish['Vendor']}</p>
+
+        <p><b>Rating:</b> {stars} ({dish['Rating']}/5)</p>
+
+        <p><b>Total Votes:</b> {dish['Votes']}</p>
+
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
 st.markdown("---")
@@ -224,28 +437,17 @@ vendors = list(meal_data.keys())
 
 tabs = st.tabs(vendors)
 
-# Star rating options
-star_options = {
-    "⭐": 1,
-    "⭐⭐": 2,
-    "⭐⭐⭐": 3,
-    "⭐⭐⭐⭐": 4,
-    "⭐⭐⭐⭐⭐": 5
-}
-
 for tab, vendor in zip(tabs, vendors):
 
     with tab:
 
-        st.header(f"🏪 {vendor}")
+        st.markdown(f"## 🏪 {vendor}")
 
         foods = meal_data[vendor]
 
         cols = st.columns(2)
 
         for index, food in enumerate(foods):
-
-            # SEARCH FILTER
 
             if search_query:
 
@@ -267,6 +469,11 @@ for tab, vendor in zip(tabs, vendors):
 
             with cols[index % 2]:
 
+                st.markdown(
+                    '<div class="food-card">',
+                    unsafe_allow_html=True
+                )
+
                 st.subheader(food)
 
                 st.write(
@@ -275,35 +482,46 @@ for tab, vendor in zip(tabs, vendors):
 
                 st.write(f"👥 Total Votes: {votes}")
 
-                # STAR RATING SELECT
+                # SINGLE STAR BAR
 
-                selected_star = st.radio(
-                    f"Rate {food}",
-                    options=list(star_options.keys()),
-                    horizontal=True,
-                    key=f"radio_{key}"
+                user_rating = st.feedback(
+                    "stars",
+                    key=f"feedback_{key}"
                 )
 
                 # SUBMIT BUTTON
 
                 if st.button(
-                    f"Submit Rating",
+                    "Submit Rating",
                     key=f"btn_{key}"
                 ):
 
-                    user_rating = star_options[selected_star]
+                    if user_rating is not None:
 
-                    ratings_data[key]["total_rating"] += user_rating
+                        ratings_data[key]["total_rating"] += (
+                            user_rating + 1
+                        )
 
-                    ratings_data[key]["votes"] += 1
+                        ratings_data[key]["votes"] += 1
 
-                    save_data(ratings_data)
+                        save_data(ratings_data)
 
-                    st.success(
-                        f"You rated {food} {selected_star}"
-                    )
+                        st.success(
+                            f"You rated {food} {user_rating + 1}⭐"
+                        )
 
-                    st.rerun()
+                        st.rerun()
+
+                    else:
+
+                        st.warning(
+                            "Please select stars before submitting."
+                        )
+
+                st.markdown(
+                    '</div>',
+                    unsafe_allow_html=True
+                )
 
 # ---------------------------------------------------
 # FOOTER
