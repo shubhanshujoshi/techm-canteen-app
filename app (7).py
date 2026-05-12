@@ -393,7 +393,7 @@ meal_data = default_data[selected_meal]
 # TOP 5 HIGHEST RATED
 # ---------------------------------------------------
 
-st.markdown("## 🏆 Top 5 Highest Rated Dishes")
+st.markdown("## Top 5 Highest Rated Dishes")
 
 top_dishes = []
 
@@ -435,7 +435,7 @@ for idx, dish in enumerate(top_5, start=1):
         f"""
         <div class="top-rated-box">
 
-        <h3>#{idx} 🍽️ {dish['Food']}</h3>
+        <h3>#{idx}  {dish['Food']}</h3>
 
         <p><b>Vendor:</b> {dish['Vendor']}</p>
 
@@ -462,7 +462,7 @@ for tab, vendor in zip(tabs, vendors):
 
     with tab:
 
-        st.markdown(f"## 🏪 {vendor}")
+        st.markdown(f"##  {vendor}")
 
         foods = meal_data[vendor]
 
