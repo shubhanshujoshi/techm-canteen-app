@@ -572,7 +572,7 @@ for tab, vendor in zip(tabs, vendors):
             <h3>{selected_food}</h3>
 
             <p>
-            ⭐ <b>Live Rating:</b>
+            <b>Live Rating:</b>
             {stars} ({avg_rating}/5)
             </p>
 
