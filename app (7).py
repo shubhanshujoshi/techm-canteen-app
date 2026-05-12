@@ -250,9 +250,9 @@ ratings_data = load_data()
 # RESET BUTTON
 # ---------------------------------------------------
 
-st.sidebar.markdown("## ⚙️ Controls")
+st.sidebar.markdown("## Controls")
 
-if st.sidebar.button("🔄 Reset All Ratings"):
+if st.sidebar.button("Reset All Ratings"):
 
     ratings_data = initialize_ratings()
 
@@ -288,7 +288,7 @@ auto_meal = get_current_meal()
 # SIDEBAR
 # ---------------------------------------------------
 
-st.sidebar.title("🍽 Meal Filters")
+st.sidebar.title("Meal Filters")
 
 selected_meal = st.sidebar.selectbox(
     "Select Meal Time",
@@ -335,7 +335,7 @@ st.markdown("---")
 # TOP 5
 # ---------------------------------------------------
 
-st.markdown("## 🏆 Top 5 Highest Rated Dishes")
+st.markdown("## Top 5 Highest Rated Dishes")
 
 top_dishes = []
 
@@ -383,7 +383,7 @@ for i in range(3):
                 f"""
                 <div class="top-rated-box">
 
-                <h4>{i+1}. 🍽️ {dish['Food']}</h4>
+                <h4>{i+1}. {dish['Food']}</h4>
 
                 <p><b>{dish['Vendor']}</b></p>
 
@@ -429,7 +429,7 @@ st.markdown("---")
 # BEST SELLERS
 # ---------------------------------------------------
 
-st.markdown("## 🔥 Best Selling Dish Of Each Vendor")
+st.markdown("## Best Selling Dish Of Each Vendor")
 
 best_sellers = []
 
@@ -487,7 +487,7 @@ for i in range(3):
                 f"""
                 <div class="best-seller-box">
 
-                <h4>{i+1}. 🏪 {item['Vendor']}</h4>
+                <h4>{i+1}. {item['Vendor']}</h4>
 
                 <p><b>{item['Food']}</b></p>
 
@@ -533,7 +533,7 @@ st.markdown("---")
 # RATE FOOD SECTION
 # ---------------------------------------------------
 
-st.markdown("## ⭐ Rate The Food")
+st.markdown("## Rate The Food")
 
 vendors = list(meal_data.keys())
 
@@ -543,7 +543,7 @@ for tab, vendor in zip(tabs, vendors):
 
     with tab:
 
-        st.markdown(f"### 🏪 {vendor}")
+        st.markdown(f"### {vendor}")
 
         foods = meal_data[vendor]
 
