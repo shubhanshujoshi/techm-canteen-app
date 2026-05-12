@@ -20,7 +20,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* Main App Background */
+/* Main Background */
 
 .stApp {
     background-color: #f5f5f5;
@@ -34,7 +34,7 @@ st.markdown("""
     -webkit-text-fill-color: transparent;
     font-size: 42px;
     font-weight: 800;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 /* Subtitle */
@@ -67,7 +67,7 @@ st.markdown("""
     box-shadow: 0px 3px 12px rgba(0,0,0,0.08);
 }
 
-/* Tabs */
+/* Vendor Tabs */
 
 .stTabs [data-baseweb="tab"] {
     font-size: 18px;
@@ -367,11 +367,11 @@ with col2:
 st.markdown("---")
 
 # ---------------------------------------------------
-# SEARCH
+# SEARCH BAR
 # ---------------------------------------------------
 
 search_query = st.text_input(
-    " Search Food Item",
+    "🔍 Search Food Item",
     placeholder="Search dosa, biryani, tea..."
 )
 
@@ -393,7 +393,7 @@ meal_data = default_data[selected_meal]
 # TOP 5 HIGHEST RATED
 # ---------------------------------------------------
 
-st.markdown("## Top 5 Highest Rated Dishes")
+st.markdown("## 🏆 Top 5 Highest Rated Dishes")
 
 top_dishes = []
 
@@ -435,7 +435,7 @@ for idx, dish in enumerate(top_5, start=1):
         f"""
         <div class="top-rated-box">
 
-        <h3>#{idx}  {dish['Food']}</h3>
+        <h3>#{idx} 🍽️ {dish['Food']}</h3>
 
         <p><b>Vendor:</b> {dish['Vendor']}</p>
 
@@ -462,13 +462,15 @@ for tab, vendor in zip(tabs, vendors):
 
     with tab:
 
-        st.markdown(f"##  {vendor}")
+        st.markdown(f"## 🏪 {vendor}")
 
         foods = meal_data[vendor]
 
         cols = st.columns(2)
 
         for index, food in enumerate(foods):
+
+            # SEARCH FILTER
 
             if search_query:
 
@@ -490,59 +492,61 @@ for tab, vendor in zip(tabs, vendors):
 
             with cols[index % 2]:
 
-                st.markdown(
-                    '<div class="food-card">',
-                    unsafe_allow_html=True
-                )
+                with st.container():
 
-                st.subheader(food)
+                    st.markdown(
+                        '<div class="food-card">',
+                        unsafe_allow_html=True
+                    )
 
-                st.write(
-                    f"⭐ Live Rating: {display_stars} ({avg_rating}/5)"
-                )
+                    st.subheader(food)
 
-                st.write(f"👥 Total Votes: {votes}")
+                    st.write(
+                        f"⭐ Live Rating: {display_stars} ({avg_rating}/5)"
+                    )
 
-                # STAR RATING
+                    st.write(f"👥 Total Votes: {votes}")
 
-                user_rating = st.feedback(
-                    "stars",
-                    key=f"feedback_{key}"
-                )
+                    # STAR RATING
 
-                # SUBMIT BUTTON
+                    user_rating = st.feedback(
+                        "stars",
+                        key=f"feedback_{key}"
+                    )
 
-                if st.button(
-                    "Submit Rating",
-                    key=f"btn_{key}"
-                ):
+                    # SUBMIT BUTTON
 
-                    if user_rating is not None:
+                    if st.button(
+                        "Submit Rating",
+                        key=f"btn_{key}"
+                    ):
 
-                        ratings_data[key]["total_rating"] += (
-                            user_rating + 1
-                        )
+                        if user_rating is not None:
 
-                        ratings_data[key]["votes"] += 1
+                            ratings_data[key]["total_rating"] += (
+                                user_rating + 1
+                            )
 
-                        save_data(ratings_data)
+                            ratings_data[key]["votes"] += 1
 
-                        st.success(
-                            f"You rated {food} {user_rating + 1}⭐"
-                        )
+                            save_data(ratings_data)
 
-                        st.rerun()
+                            st.success(
+                                f"You rated {food} {user_rating + 1}⭐"
+                            )
 
-                    else:
+                            st.rerun()
 
-                        st.warning(
-                            "Please select stars before submitting."
-                        )
+                        else:
 
-                st.markdown(
-                    '</div>',
-                    unsafe_allow_html=True
-                )
+                            st.warning(
+                                "Please select stars before submitting."
+                            )
+
+                    st.markdown(
+                        '</div>',
+                        unsafe_allow_html=True
+                    )
 
 # ---------------------------------------------------
 # FOOTER
