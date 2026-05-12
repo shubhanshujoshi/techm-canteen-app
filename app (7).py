@@ -342,14 +342,7 @@ meal_data = default_data[selected_meal]
 # HEADER
 # ---------------------------------------------------
 
-st.markdown("""
-<div class="header-container">
 
-    <img src="data:image/png;base64,"
-    class="logo-img">
-
-</div>
-""", unsafe_allow_html=True)
 
 col1, col2 = st.columns([1, 8])
 
