@@ -1,4 +1,3 @@
-```python id="8g4yt9"
 import streamlit as st
 from datetime import datetime
 import json
@@ -680,4 +679,3 @@ st.markdown("---")
 st.caption(
     "Built for Tech Mahindra Canteen Management System"
 )
-```
