@@ -20,10 +20,47 @@ st.set_page_config(
 st.markdown("""
 <style>
 
+/* Import Aptos-like clean font */
+
+html, body, [class*="css"] {
+    font-family: Aptos, "Segoe UI", sans-serif;
+}
+
 /* Background */
 
 .stApp {
     background-color: #f5f5f5;
+    color: #111111;
+}
+
+/* Dark Mode Fix */
+
+@media (prefers-color-scheme: dark) {
+
+    .stApp {
+        background-color: #111111 !important;
+        color: white !important;
+    }
+
+    p, h1, h2, h3, h4, h5, h6, label, div {
+        color: white !important;
+    }
+
+    .food-card,
+    .top-rated-box,
+    .best-seller-box {
+        background-color: #1e1e1e !important;
+        color: white !important;
+    }
+
+    section[data-testid="stSidebar"] {
+        background-color: #1a1a1a !important;
+    }
+
+    .stTextInput > div > div > input {
+        background-color: #1e1e1e !important;
+        color: white !important;
+    }
 }
 
 /* Main Title */
@@ -32,8 +69,8 @@ st.markdown("""
     background: linear-gradient(90deg, #E20031, #ff4d6d);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-size: 42px;
-    font-weight: 800;
+    font-size: 32px;
+    font-weight: 700;
     margin-top: 10px;
 }
 
@@ -41,48 +78,48 @@ st.markdown("""
 
 .sub-title {
     color: #555555;
-    font-size: 20px;
-    margin-top: -10px;
+    font-size: 16px;
+    margin-top: -8px;
 }
 
 /* Food Cards */
 
 .food-card {
     background-color: white;
-    padding: 20px;
-    border-radius: 18px;
+    padding: 18px;
+    border-radius: 16px;
     border-top: 5px solid #E20031;
     margin-bottom: 20px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
 }
 
 /* Top Rated */
 
 .top-rated-box {
     background-color: white;
-    padding: 18px;
-    border-radius: 15px;
-    border-left: 8px solid #E20031;
-    margin-bottom: 15px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+    padding: 16px;
+    border-radius: 14px;
+    border-left: 7px solid #E20031;
+    margin-bottom: 14px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
 }
 
 /* Best Seller */
 
 .best-seller-box {
     background-color: white;
-    padding: 18px;
-    border-radius: 15px;
-    border-left: 8px solid #E20031;
-    margin-bottom: 15px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+    padding: 16px;
+    border-radius: 14px;
+    border-left: 7px solid #E20031;
+    margin-bottom: 14px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
 }
 
 /* Tabs */
 
 .stTabs [data-baseweb="tab"] {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 600;
     color: #E20031;
 }
 
@@ -137,175 +174,35 @@ DATA_FILE = "ratings_data.json"
 default_data = {
 
     "Breakfast": {
-
-        "Vendor A": [
-            "Poha",
-            "Upma",
-            "Tea",
-            "Coffee",
-            "Sandwich"
-        ],
-
-        "Vendor B": [
-            "Idli",
-            "Dosa",
-            "Coffee",
-            "Vada",
-            "Pongal"
-        ],
-
-        "Vendor C": [
-            "Paratha",
-            "Curd",
-            "Tea",
-            "Aloo Puri",
-            "Lassi"
-        ],
-
-        "Vendor D": [
-            "Bread Omelette",
-            "Boiled Eggs",
-            "Tea",
-            "Maggi",
-            "Milk"
-        ],
-
-        "Vendor E": [
-            "Cornflakes",
-            "Milk",
-            "Banana Shake",
-            "Oats",
-            "Fruit Bowl"
-        ]
+        "Vendor A": ["Poha", "Upma", "Tea", "Coffee", "Sandwich"],
+        "Vendor B": ["Idli", "Dosa", "Coffee", "Vada", "Pongal"],
+        "Vendor C": ["Paratha", "Curd", "Tea", "Aloo Puri", "Lassi"],
+        "Vendor D": ["Bread Omelette", "Boiled Eggs", "Tea", "Maggi", "Milk"],
+        "Vendor E": ["Cornflakes", "Milk", "Banana Shake", "Oats", "Fruit Bowl"]
     },
 
     "Lunch": {
-
-        "Vendor A": [
-            "Dal Rice",
-            "Paneer Butter Masala",
-            "Roti",
-            "Veg Pulao",
-            "Salad"
-        ],
-
-        "Vendor B": [
-            "Biryani",
-            "Raita",
-            "Cold Drink",
-            "Chicken Curry",
-            "Naan"
-        ],
-
-        "Vendor C": [
-            "Rajma Chawal",
-            "Salad",
-            "Papad",
-            "Mix Veg",
-            "Jeera Rice"
-        ],
-
-        "Vendor D": [
-            "Fried Rice",
-            "Manchurian",
-            "Noodles",
-            "Spring Roll",
-            "Soup"
-        ],
-
-        "Vendor E": [
-            "Butter Chicken",
-            "Jeera Rice",
-            "Roti",
-            "Dal Makhani",
-            "Paneer Tikka"
-        ]
+        "Vendor A": ["Dal Rice", "Paneer Butter Masala", "Roti", "Veg Pulao", "Salad"],
+        "Vendor B": ["Biryani", "Raita", "Cold Drink", "Chicken Curry", "Naan"],
+        "Vendor C": ["Rajma Chawal", "Salad", "Papad", "Mix Veg", "Jeera Rice"],
+        "Vendor D": ["Fried Rice", "Manchurian", "Noodles", "Spring Roll", "Soup"],
+        "Vendor E": ["Butter Chicken", "Jeera Rice", "Roti", "Dal Makhani", "Paneer Tikka"]
     },
 
     "Snacks": {
-
-        "Vendor A": [
-            "Samosa",
-            "Tea",
-            "Coffee",
-            "Burger",
-            "French Fries"
-        ],
-
-        "Vendor B": [
-            "Puff",
-            "Cold Coffee",
-            "Burger",
-            "Pizza Slice",
-            "Momos"
-        ],
-
-        "Vendor C": [
-            "Momos",
-            "Spring Roll",
-            "Tea",
-            "Sandwich",
-            "Cold Drink"
-        ],
-
-        "Vendor D": [
-            "French Fries",
-            "Pizza Slice",
-            "Pepsi",
-            "Pasta",
-            "Garlic Bread"
-        ],
-
-        "Vendor E": [
-            "Pasta",
-            "Garlic Bread",
-            "Milkshake",
-            "Brownie",
-            "Nachos"
-        ]
+        "Vendor A": ["Samosa", "Tea", "Coffee", "Burger", "French Fries"],
+        "Vendor B": ["Puff", "Cold Coffee", "Burger", "Pizza Slice", "Momos"],
+        "Vendor C": ["Momos", "Spring Roll", "Tea", "Sandwich", "Cold Drink"],
+        "Vendor D": ["French Fries", "Pizza Slice", "Pepsi", "Pasta", "Garlic Bread"],
+        "Vendor E": ["Pasta", "Garlic Bread", "Milkshake", "Brownie", "Nachos"]
     },
 
     "Dinner": {
-
-        "Vendor A": [
-            "Dal Tadka",
-            "Roti",
-            "Rice",
-            "Kheer",
-            "Paneer Curry"
-        ],
-
-        "Vendor B": [
-            "Kadhai Paneer",
-            "Naan",
-            "Lassi",
-            "Butter Chicken",
-            "Soup"
-        ],
-
-        "Vendor C": [
-            "Khichdi",
-            "Curd",
-            "Pickle",
-            "Veg Curry",
-            "Rice"
-        ],
-
-        "Vendor D": [
-            "Hakka Noodles",
-            "Soup",
-            "Manchurian",
-            "Fried Rice",
-            "Spring Roll"
-        ],
-
-        "Vendor E": [
-            "Butter Chicken",
-            "Rice",
-            "Roti",
-            "Dal Fry",
-            "Ice Cream"
-        ]
+        "Vendor A": ["Dal Tadka", "Roti", "Rice", "Kheer", "Paneer Curry"],
+        "Vendor B": ["Kadhai Paneer", "Naan", "Lassi", "Butter Chicken", "Soup"],
+        "Vendor C": ["Khichdi", "Curd", "Pickle", "Veg Curry", "Rice"],
+        "Vendor D": ["Hakka Noodles", "Soup", "Manchurian", "Fried Rice", "Spring Roll"],
+        "Vendor E": ["Butter Chicken", "Rice", "Roti", "Dal Fry", "Ice Cream"]
     }
 }
 
@@ -407,7 +304,24 @@ def get_current_meal():
     else:
         return "Dinner"
 
-current_meal = get_current_meal()
+auto_meal = get_current_meal()
+
+# ---------------------------------------------------
+# SIDEBAR FILTER
+# ---------------------------------------------------
+
+st.sidebar.title("🍽 Meal Filters")
+
+selected_meal = st.sidebar.selectbox(
+    "Select Meal Time",
+    ["Breakfast", "Lunch", "Snacks", "Dinner"],
+    index=["Breakfast", "Lunch", "Snacks", "Dinner"].index(auto_meal)
+)
+
+# IMPORTANT FIX
+current_meal = selected_meal
+
+meal_data = default_data[selected_meal]
 
 # ---------------------------------------------------
 # HEADER
@@ -416,7 +330,7 @@ current_meal = get_current_meal()
 col1, col2 = st.columns([1, 8])
 
 with col1:
-    st.image("logo.png", width=90)
+    st.image("logo.png", width=70)
 
 with col2:
 
@@ -450,21 +364,7 @@ search_query = st.text_input(
 )
 
 # ---------------------------------------------------
-# SIDEBAR FILTER
-# ---------------------------------------------------
-
-st.sidebar.title("🍽 Meal Filters")
-
-selected_meal = st.sidebar.selectbox(
-    "Select Meal Time",
-    ["Breakfast", "Lunch", "Snacks", "Dinner"],
-    index=["Breakfast", "Lunch", "Snacks", "Dinner"].index(current_meal)
-)
-
-meal_data = default_data[selected_meal]
-
-# ---------------------------------------------------
-# TOP 5 HIGHEST RATED
+# TOP 5
 # ---------------------------------------------------
 
 st.markdown("## 🏆 Top 5 Highest Rated Dishes")
@@ -489,13 +389,12 @@ for vendor, foods in meal_data.items():
         top_dishes.append({
             "Food": food,
             "Vendor": vendor,
-            "Rating": avg_rating,
-            "Votes": votes
+            "Rating": avg_rating
         })
 
 top_dishes = sorted(
     top_dishes,
-    key=lambda x: (x["Rating"], x["Votes"]),
+    key=lambda x: x["Rating"],
     reverse=True
 )
 
@@ -582,7 +481,7 @@ for tab, vendor in zip(tabs, vendors):
 
     with tab:
 
-        st.markdown(f"## 🏪 {vendor}")
+        st.markdown(f"### 🏪 {vendor}")
 
         foods = meal_data[vendor]
 
@@ -620,7 +519,7 @@ for tab, vendor in zip(tabs, vendors):
                     f"""
                     <div class="food-card">
 
-                    <h3>{food}</h3>
+                    <h4>{food}</h4>
 
                     <p>
                     ⭐ <b>Live Rating:</b>
