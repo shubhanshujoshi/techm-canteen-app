@@ -115,16 +115,19 @@ meal_data = default_data[selected_meal]
 
 for vendor, foods in meal_data.items():
 
-    st.markdown("---")
-    st.header(f"🏪 {vendor}")
+    # ---------------------------------------------------
+# TOP 5 DISHES SECTION
+# ---------------------------------------------------
 
-    cols = st.columns(2)
+st.markdown("## 🏆 Top Rated Dishes Right Now")
 
-    for index, food in enumerate(foods):
+top_dishes = []
 
-        if search_query:
-            if search_query.lower() not in food.lower():
-                continue
+meal_data = default_data[selected_meal]
+
+for vendor, foods in meal_data.items():
+
+    for food in foods:
 
         key = f"{selected_meal}|{vendor}|{food}"
 
@@ -133,33 +136,96 @@ for vendor, foods in meal_data.items():
 
         avg_rating = round(total_rating / votes, 1) if votes > 0 else 0
 
-        with cols[index % 2]:
+        top_dishes.append({
+            "Food": food,
+            "Vendor": vendor,
+            "Rating": avg_rating,
+            "Votes": votes
+        })
 
-            st.subheader(food)
+# Sort by rating then votes
+top_dishes = sorted(
+    top_dishes,
+    key=lambda x: (x["Rating"], x["Votes"]),
+    reverse=True
+)
 
-            st.write(f"⭐ Live Rating: **{avg_rating}/5**")
-            st.write(f"👥 Total Votes: {votes}")
+top_5 = top_dishes[:5]
 
-            user_rating = st.slider(
-                f"Rate {food}",
-                min_value=1,
-                max_value=5,
-                value=5,
-                key=f"slider_{key}"
-            )
+for idx, dish in enumerate(top_5, start=1):
 
-            if st.button(f"Submit Rating for {food}", key=f"btn_{key}"):
-
-                ratings_data[key]["total_rating"] += user_rating
-                ratings_data[key]["votes"] += 1
-
-                save_data(ratings_data)
-
-                st.success(
-                    f"Thanks! You rated {food} {user_rating}⭐"
-                )
-
-                st.rerun()
+    st.markdown(
+        f"""
+        ### #{idx} 🍽️ {dish['Food']}
+        🏪 Vendor: {dish['Vendor']}  
+        ⭐ Rating: {dish['Rating']}/5  
+        👥 Votes: {dish['Votes']}
+        """
+    )
 
 st.markdown("---")
-st.caption("Built for Tech Mahindra Canteen Management System")
+
+# ---------------------------------------------------
+# VENDOR TABS
+# ---------------------------------------------------
+
+vendors = list(meal_data.keys())
+
+tabs = st.tabs(vendors)
+
+for tab, vendor in zip(tabs, vendors):
+
+    with tab:
+
+        st.header(f"🏪 {vendor}")
+
+        foods = meal_data[vendor]
+
+        cols = st.columns(2)
+
+        for index, food in enumerate(foods):
+
+            if search_query:
+                if search_query.lower() not in food.lower():
+                    continue
+
+            key = f"{selected_meal}|{vendor}|{food}"
+
+            total_rating = ratings_data[key]["total_rating"]
+            votes = ratings_data[key]["votes"]
+
+            avg_rating = (
+                round(total_rating / votes, 1)
+                if votes > 0 else 0
+            )
+
+            with cols[index % 2]:
+
+                st.subheader(food)
+
+                st.write(f"⭐ Live Rating: **{avg_rating}/5**")
+                st.write(f"👥 Total Votes: {votes}")
+
+                user_rating = st.slider(
+                    f"Rate {food}",
+                    min_value=1,
+                    max_value=5,
+                    value=5,
+                    key=f"slider_{key}"
+                )
+
+                if st.button(
+                    f"Submit Rating for {food}",
+                    key=f"btn_{key}"
+                ):
+
+                    ratings_data[key]["total_rating"] += user_rating
+                    ratings_data[key]["votes"] += 1
+
+                    save_data(ratings_data)
+
+                    st.success(
+                        f"Thanks! You rated {food} {user_rating}⭐"
+                    )
+
+                    st.rerun()
