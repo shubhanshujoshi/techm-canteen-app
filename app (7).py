@@ -336,7 +336,7 @@ st.markdown("---")
 # TOP 5 DISHES
 # ---------------------------------------------------
 
-st.markdown("## 🏆 Top 5 Highest Rated Dishes")
+st.markdown("## Top 5 Highest Rated Dishes")
 
 top_dishes = []
 
@@ -384,7 +384,7 @@ for i in range(3):
                 f"""
                 <div class="top-rated-box">
 
-                <h4>#{i+1} 🍽️ {dish['Food']}</h4>
+                <h4>#{i+1} {dish['Food']}</h4>
 
                 <p><b>{dish['Vendor']}</b></p>
 
@@ -413,7 +413,7 @@ for idx, col in zip([3,4], [col1,col2]):
                 f"""
                 <div class="top-rated-box">
 
-                <h4>#{idx+1} 🍽️ {dish['Food']}</h4>
+                <h4>#{idx+1} {dish['Food']}</h4>
 
                 <p><b>{dish['Vendor']}</b></p>
 
