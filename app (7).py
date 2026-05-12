@@ -412,7 +412,7 @@ for idx, col in zip([3,4], [col1,col2]):
                 f"""
                 <div class="top-rated-box">
 
-                <h4>{idx+1}. 🍽️ {dish['Food']}</h4>
+                <h4>{idx+1}. {dish['Food']}</h4>
 
                 <p><b>{dish['Vendor']}</b></p>
 
@@ -516,7 +516,7 @@ for idx, col in zip([3,4], [col1,col2]):
                 f"""
                 <div class="best-seller-box">
 
-                <h4>{idx+1}. 🏪 {item['Vendor']}</h4>
+                <h4>{idx+1}. {item['Vendor']}</h4>
 
                 <p><b>{item['Food']}</b></p>
 
@@ -577,7 +577,7 @@ for tab, vendor in zip(tabs, vendors):
             </p>
 
             <p>
-            👥 <b>Total Votes:</b> {votes}
+            <b>Total Votes:</b> {votes}
             </p>
 
             </div>
