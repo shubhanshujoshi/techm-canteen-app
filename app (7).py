@@ -81,7 +81,6 @@ def initialize_ratings():
 
     return ratings
 
-
 # ---------------------------------------------------
 # LOAD DATA
 # ---------------------------------------------------
@@ -100,7 +99,6 @@ def load_data():
 
     return data
 
-
 # ---------------------------------------------------
 # SAVE DATA
 # ---------------------------------------------------
@@ -109,7 +107,6 @@ def save_data(data):
 
     with open(DATA_FILE, "w") as f:
         json.dump(data, f)
-
 
 ratings_data = load_data()
 
@@ -132,7 +129,6 @@ def get_current_meal():
 
     else:
         return "Dinner"
-
 
 current_meal = get_current_meal()
 
@@ -168,7 +164,7 @@ selected_meal = st.sidebar.selectbox(
 meal_data = default_data[selected_meal]
 
 # ---------------------------------------------------
-# TOP RATED DISHES
+# TOP 5 HIGHEST RATED
 # ---------------------------------------------------
 
 st.markdown("## 🏆 Top 5 Highest Rated Dishes")
@@ -182,6 +178,7 @@ for vendor, foods in meal_data.items():
         key = f"{selected_meal}|{vendor}|{food}"
 
         total_rating = ratings_data[key]["total_rating"]
+
         votes = ratings_data[key]["votes"]
 
         avg_rating = (
@@ -196,7 +193,6 @@ for vendor, foods in meal_data.items():
             "Votes": votes
         })
 
-# Sort dishes by rating and votes
 top_dishes = sorted(
     top_dishes,
     key=lambda x: (x["Rating"], x["Votes"]),
@@ -207,11 +203,13 @@ top_5 = top_dishes[:5]
 
 for idx, dish in enumerate(top_5, start=1):
 
+    stars = "⭐" * int(round(dish["Rating"]))
+
     st.markdown(
         f"""
         ### #{idx} 🍽️ {dish['Food']}
         🏪 Vendor: {dish['Vendor']}  
-        ⭐ Rating: {dish['Rating']}/5  
+        {stars} ({dish['Rating']}/5)  
         👥 Votes: {dish['Votes']}
         """
     )
@@ -225,6 +223,15 @@ st.markdown("---")
 vendors = list(meal_data.keys())
 
 tabs = st.tabs(vendors)
+
+# Star rating options
+star_options = {
+    "⭐": 1,
+    "⭐⭐": 2,
+    "⭐⭐⭐": 3,
+    "⭐⭐⭐⭐": 4,
+    "⭐⭐⭐⭐⭐": 5
+}
 
 for tab, vendor in zip(tabs, vendors):
 
@@ -256,30 +263,35 @@ for tab, vendor in zip(tabs, vendors):
                 if votes > 0 else 0
             )
 
+            display_stars = "⭐" * int(round(avg_rating))
+
             with cols[index % 2]:
 
                 st.subheader(food)
 
-                st.write(f"⭐ Live Rating: **{avg_rating}/5**")
+                st.write(
+                    f"⭐ Live Rating: {display_stars} ({avg_rating}/5)"
+                )
 
                 st.write(f"👥 Total Votes: {votes}")
 
-                # RATING SLIDER
+                # STAR RATING SELECT
 
-                user_rating = st.slider(
+                selected_star = st.radio(
                     f"Rate {food}",
-                    min_value=1,
-                    max_value=5,
-                    value=5,
-                    key=f"slider_{key}"
+                    options=list(star_options.keys()),
+                    horizontal=True,
+                    key=f"radio_{key}"
                 )
 
                 # SUBMIT BUTTON
 
                 if st.button(
-                    f"Submit Rating for {food}",
+                    f"Submit Rating",
                     key=f"btn_{key}"
                 ):
+
+                    user_rating = star_options[selected_star]
 
                     ratings_data[key]["total_rating"] += user_rating
 
@@ -288,7 +300,7 @@ for tab, vendor in zip(tabs, vendors):
                     save_data(ratings_data)
 
                     st.success(
-                        f"Thanks! You rated {food} {user_rating}⭐"
+                        f"You rated {food} {selected_star}"
                     )
 
                     st.rerun()
