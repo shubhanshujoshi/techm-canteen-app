@@ -54,6 +54,12 @@ html, body, [class*="css"] {
     section[data-testid="stSidebar"] {
         background-color: #1a1a1a !important;
     }
+
+    .stTextInput > div > div > input,
+    .stSelectbox > div > div {
+        background-color: #1e1e1e !important;
+        color: white !important;
+    }
 }
 
 /* Main Title */
@@ -123,24 +129,11 @@ section[data-testid="stSidebar"] {
     background-color: white;
 }
 
-/* BIGGER STAR RATING */
+/* Bigger Rating Stars */
 
-button[kind="borderless"] {
-    font-size: 34px !important;
-    padding: 6px !important;
-}
-
-/* Mobile Responsive */
-
-@media (max-width: 768px) {
-
-    .main-title {
-        font-size: 22px;
-    }
-
-    button[kind="borderless"] {
-        font-size: 42px !important;
-    }
+[data-testid="stFeedback"] button {
+    transform: scale(1.8);
+    margin-right: 12px;
 }
 
 </style>
@@ -591,8 +584,6 @@ for tab, vendor in zip(tabs, vendors):
             """,
             unsafe_allow_html=True
         )
-
-        st.markdown("### Tap Stars To Rate")
 
         user_rating = st.feedback(
             "stars",
