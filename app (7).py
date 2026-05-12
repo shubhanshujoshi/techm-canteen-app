@@ -9,101 +9,105 @@ import os
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
-    page_icon="🔺",
+    page_icon="logo.png",
     layout="wide"
 )
 
 # ---------------------------------------------------
-# CUSTOM CSS - TECH MAHINDRA THEME
+# CUSTOM CSS
 # ---------------------------------------------------
 
 st.markdown("""
 <style>
 
-/* Main Background */
+/* Main App Background */
 
 .stApp {
-    background-color: #f8f8f8;
+    background-color: #f5f5f5;
 }
 
-/* Header */
+/* Main Title */
 
 .main-title {
-    color: #D71920;
+    background: linear-gradient(90deg, #E20031, #ff4d6d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     font-size: 42px;
     font-weight: 800;
-    text-align: center;
+    margin-top: 15px;
 }
+
+/* Subtitle */
 
 .sub-title {
     color: #555555;
-    text-align: center;
     font-size: 20px;
-    margin-bottom: 30px;
-}
-
-/* Top Rated Section */
-
-.top-rated-box {
-    background-color: white;
-    padding: 18px;
-    border-radius: 15px;
-    border-left: 8px solid #D71920;
-    margin-bottom: 15px;
-    box-shadow: 0px 2px 10px rgba(0,0,0,0.08);
+    margin-top: -10px;
 }
 
 /* Food Cards */
 
 .food-card {
     background-color: white;
-    padding: 18px;
+    padding: 20px;
     border-radius: 18px;
-    border-top: 6px solid #D71920;
+    border-top: 6px solid #E20031;
     margin-bottom: 20px;
-    box-shadow: 0px 2px 10px rgba(0,0,0,0.08);
+    box-shadow: 0px 3px 12px rgba(0,0,0,0.08);
 }
 
-/* Vendor Tabs */
+/* Top Rated Cards */
+
+.top-rated-box {
+    background-color: white;
+    padding: 18px;
+    border-radius: 15px;
+    border-left: 8px solid #E20031;
+    margin-bottom: 15px;
+    box-shadow: 0px 3px 12px rgba(0,0,0,0.08);
+}
+
+/* Tabs */
 
 .stTabs [data-baseweb="tab"] {
     font-size: 18px;
-    font-weight: 600;
-    color: #D71920;
+    font-weight: 700;
+    color: #E20031;
 }
 
 .stTabs [aria-selected="true"] {
-    background-color: #D71920 !important;
+    background-color: #E20031 !important;
     color: white !important;
     border-radius: 10px;
 }
 
 /* Buttons */
 
-.stButton>button {
-    background-color: #D71920;
+.stButton > button {
+    background-color: #E20031;
     color: white;
     border-radius: 10px;
     border: none;
     font-weight: 600;
+    width: 100%;
 }
 
-.stButton>button:hover {
-    background-color: #a51218;
+.stButton > button:hover {
+    background-color: #b80028;
     color: white;
+}
+
+/* Search Box */
+
+.stTextInput > div > div > input {
+    border: 2px solid #E20031;
+    border-radius: 10px;
 }
 
 /* Sidebar */
 
 section[data-testid="stSidebar"] {
-    background-color: #ffffff;
-}
-
-/* Search Box */
-
-.stTextInput>div>div>input {
-    border: 2px solid #D71920;
-    border-radius: 10px;
+    background-color: white;
 }
 
 </style>
@@ -335,15 +339,32 @@ current_meal = get_current_meal()
 # HEADER
 # ---------------------------------------------------
 
-st.markdown(
-    '<div class="main-title">🔺 Tech Mahindra Smart Canteen</div>',
-    unsafe_allow_html=True
-)
+col1, col2 = st.columns([1, 8])
 
-st.markdown(
-    f'<div class="sub-title">Currently Serving: {current_meal}</div>',
-    unsafe_allow_html=True
-)
+with col1:
+    st.image("logo.png", width=90)
+
+with col2:
+
+    st.markdown(
+        """
+        <div class="main-title">
+            Tech Mahindra Smart Canteen
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        f"""
+        <div class="sub-title">
+            Currently Serving: <b>{current_meal}</b>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+st.markdown("---")
 
 # ---------------------------------------------------
 # SEARCH
@@ -369,7 +390,7 @@ selected_meal = st.sidebar.selectbox(
 meal_data = default_data[selected_meal]
 
 # ---------------------------------------------------
-# TOP RATED SECTION
+# TOP 5 HIGHEST RATED
 # ---------------------------------------------------
 
 st.markdown("## 🏆 Top 5 Highest Rated Dishes")
@@ -482,7 +503,7 @@ for tab, vendor in zip(tabs, vendors):
 
                 st.write(f"👥 Total Votes: {votes}")
 
-                # SINGLE STAR BAR
+                # STAR RATING
 
                 user_rating = st.feedback(
                     "stars",
