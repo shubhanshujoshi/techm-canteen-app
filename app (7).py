@@ -1,3 +1,4 @@
+```python id="8g4yt9"
 import streamlit as st
 from datetime import datetime
 import json
@@ -20,7 +21,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* Import Aptos-like clean font */
+/* Global Font */
 
 html, body, [class*="css"] {
     font-family: Aptos, "Segoe UI", sans-serif;
@@ -33,7 +34,7 @@ html, body, [class*="css"] {
     color: #111111;
 }
 
-/* Dark Mode Fix */
+/* Dark Mode */
 
 @media (prefers-color-scheme: dark) {
 
@@ -48,7 +49,8 @@ html, body, [class*="css"] {
 
     .food-card,
     .top-rated-box,
-    .best-seller-box {
+    .best-seller-box,
+    .search-card {
         background-color: #1e1e1e !important;
         color: white !important;
     }
@@ -63,62 +65,58 @@ html, body, [class*="css"] {
     }
 }
 
+/* Header Container */
+
+.header-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+/* Logo */
+
+.logo-img {
+    width: 55px;
+}
+
 /* Main Title */
 
 .main-title {
     background: linear-gradient(90deg, #E20031, #ff4d6d);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 700;
-    margin-top: 10px;
+    line-height: 1.2;
 }
 
 /* Subtitle */
 
 .sub-title {
     color: #555555;
-    font-size: 16px;
-    margin-top: -8px;
+    font-size: 15px;
+    margin-top: 2px;
 }
 
-/* Food Cards */
+/* Cards */
 
-.food-card {
+.food-card,
+.top-rated-box,
+.best-seller-box,
+.search-card {
     background-color: white;
     padding: 18px;
     border-radius: 16px;
     border-top: 5px solid #E20031;
-    margin-bottom: 20px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
-}
-
-/* Top Rated */
-
-.top-rated-box {
-    background-color: white;
-    padding: 16px;
-    border-radius: 14px;
-    border-left: 7px solid #E20031;
-    margin-bottom: 14px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
-}
-
-/* Best Seller */
-
-.best-seller-box {
-    background-color: white;
-    padding: 16px;
-    border-radius: 14px;
-    border-left: 7px solid #E20031;
-    margin-bottom: 14px;
+    margin-bottom: 18px;
     box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
 }
 
 /* Tabs */
 
 .stTabs [data-baseweb="tab"] {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     color: #E20031;
 }
@@ -156,6 +154,25 @@ html, body, [class*="css"] {
 
 section[data-testid="stSidebar"] {
     background-color: white;
+}
+
+/* Mobile Responsive */
+
+@media (max-width: 768px) {
+
+    .header-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .main-title {
+        font-size: 24px;
+    }
+
+    .logo-img {
+        width: 50px;
+    }
 }
 
 </style>
@@ -280,7 +297,7 @@ if st.sidebar.button("🔄 Reset All Ratings"):
 
     save_data(ratings_data)
 
-    st.sidebar.success("All ratings have been reset.")
+    st.sidebar.success("All ratings reset successfully.")
 
     st.rerun()
 
@@ -307,7 +324,7 @@ def get_current_meal():
 auto_meal = get_current_meal()
 
 # ---------------------------------------------------
-# SIDEBAR FILTER
+# SIDEBAR
 # ---------------------------------------------------
 
 st.sidebar.title("🍽 Meal Filters")
@@ -318,7 +335,6 @@ selected_meal = st.sidebar.selectbox(
     index=["Breakfast", "Lunch", "Snacks", "Dinner"].index(auto_meal)
 )
 
-# IMPORTANT FIX
 current_meal = selected_meal
 
 meal_data = default_data[selected_meal]
@@ -327,10 +343,19 @@ meal_data = default_data[selected_meal]
 # HEADER
 # ---------------------------------------------------
 
+st.markdown("""
+<div class="header-container">
+
+    <img src="data:image/png;base64,"
+    class="logo-img">
+
+</div>
+""", unsafe_allow_html=True)
+
 col1, col2 = st.columns([1, 8])
 
 with col1:
-    st.image("logo.png", width=70)
+    st.image("logo.png", width=55)
 
 with col2:
 
@@ -360,8 +385,92 @@ st.markdown("---")
 
 search_query = st.text_input(
     "🔍 Search Food Item",
-    placeholder="Search food items..."
+    placeholder="Search all food items..."
 )
+
+# ---------------------------------------------------
+# SEARCH RESULTS
+# ---------------------------------------------------
+
+if search_query:
+
+    st.markdown("## 🔎 Search Results")
+
+    found = False
+
+    for meal, vendors in default_data.items():
+
+        for vendor, foods in vendors.items():
+
+            for food in foods:
+
+                if search_query.lower() in food.lower():
+
+                    found = True
+
+                    key = f"{meal}|{vendor}|{food}"
+
+                    total_rating = ratings_data[key]["total_rating"]
+
+                    votes = ratings_data[key]["votes"]
+
+                    avg_rating = (
+                        round(total_rating / votes, 1)
+                        if votes > 0 else 0
+                    )
+
+                    stars = "⭐" * int(round(avg_rating))
+
+                    st.markdown(
+                        f"""
+                        <div class="search-card">
+
+                        <h4>🍽️ {food}</h4>
+
+                        <p><b>Meal:</b> {meal}</p>
+
+                        <p><b>Vendor:</b> {vendor}</p>
+
+                        <p>
+                        ⭐ <b>Rating:</b>
+                        {stars} ({avg_rating}/5)
+                        </p>
+
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                    user_rating = st.feedback(
+                        "stars",
+                        key=f"search_{key}"
+                    )
+
+                    if st.button(
+                        f"Submit Rating for {food}",
+                        key=f"search_btn_{key}"
+                    ):
+
+                        if user_rating is not None:
+
+                            ratings_data[key]["total_rating"] += (
+                                user_rating + 1
+                            )
+
+                            ratings_data[key]["votes"] += 1
+
+                            save_data(ratings_data)
+
+                            st.success(
+                                f"You rated {food} {user_rating + 1}⭐"
+                            )
+
+                            st.rerun()
+
+    if not found:
+        st.warning("No food item found.")
+
+st.markdown("---")
 
 # ---------------------------------------------------
 # TOP 5
@@ -406,7 +515,7 @@ for idx, dish in enumerate(top_dishes[:5], start=1):
         f"""
         <div class="top-rated-box">
 
-        <h3>#{idx} 🍽️ {dish['Food']}</h3>
+        <h4>#{idx} 🍽️ {dish['Food']}</h4>
 
         <p><b>Vendor:</b> {dish['Vendor']}</p>
 
@@ -456,7 +565,7 @@ for vendor, foods in meal_data.items():
         f"""
         <div class="best-seller-box">
 
-        <h3>🏪 {vendor}</h3>
+        <h4>🏪 {vendor}</h4>
 
         <p><b>Best Selling:</b> {best_food}</p>
 
@@ -468,6 +577,12 @@ for vendor, foods in meal_data.items():
     )
 
 st.markdown("---")
+
+# ---------------------------------------------------
+# RATE FOOD SECTION
+# ---------------------------------------------------
+
+st.markdown("## ⭐ Rate The Food")
 
 # ---------------------------------------------------
 # VENDOR TABS
@@ -485,20 +600,9 @@ for tab, vendor in zip(tabs, vendors):
 
         foods = meal_data[vendor]
 
-        filtered_foods = []
-
-        for food in foods:
-
-            if search_query:
-
-                if search_query.lower() not in food.lower():
-                    continue
-
-            filtered_foods.append(food)
-
         cols = st.columns(2)
 
-        for index, food in enumerate(filtered_foods):
+        for index, food in enumerate(foods):
 
             key = f"{selected_meal}|{vendor}|{food}"
 
@@ -576,3 +680,4 @@ st.markdown("---")
 st.caption(
     "Built for Tech Mahindra Canteen Management System"
 )
+```
