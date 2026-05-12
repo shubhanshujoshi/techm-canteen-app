@@ -54,12 +54,6 @@ html, body, [class*="css"] {
     section[data-testid="stSidebar"] {
         background-color: #1a1a1a !important;
     }
-
-    .stTextInput > div > div > input,
-    .stSelectbox > div > div {
-        background-color: #1e1e1e !important;
-        color: white !important;
-    }
 }
 
 /* Main Title */
@@ -123,17 +117,30 @@ html, body, [class*="css"] {
     color: white;
 }
 
-/* Search */
-
-.stTextInput > div > div > input {
-    border: 2px solid #E20031;
-    border-radius: 10px;
-}
-
 /* Sidebar */
 
 section[data-testid="stSidebar"] {
     background-color: white;
+}
+
+/* BIGGER STAR RATING */
+
+button[kind="borderless"] {
+    font-size: 34px !important;
+    padding: 6px !important;
+}
+
+/* Mobile Responsive */
+
+@media (max-width: 768px) {
+
+    .main-title {
+        font-size: 22px;
+    }
+
+    button[kind="borderless"] {
+        font-size: 42px !important;
+    }
 }
 
 </style>
@@ -383,7 +390,7 @@ for i in range(3):
                 f"""
                 <div class="top-rated-box">
 
-                <h4>#{i+1} 🍽️ {dish['Food']}</h4>
+                <h4>{i+1}. 🍽️ {dish['Food']}</h4>
 
                 <p><b>{dish['Vendor']}</b></p>
 
@@ -412,7 +419,7 @@ for idx, col in zip([3,4], [col1,col2]):
                 f"""
                 <div class="top-rated-box">
 
-                <h4>#{idx+1} 🍽️ {dish['Food']}</h4>
+                <h4>{idx+1}. 🍽️ {dish['Food']}</h4>
 
                 <p><b>{dish['Vendor']}</b></p>
 
@@ -487,7 +494,7 @@ for i in range(3):
                 f"""
                 <div class="best-seller-box">
 
-                <h4>#{i+1} 🏪 {item['Vendor']}</h4>
+                <h4>{i+1}. 🏪 {item['Vendor']}</h4>
 
                 <p><b>{item['Food']}</b></p>
 
@@ -516,7 +523,7 @@ for idx, col in zip([3,4], [col1,col2]):
                 f"""
                 <div class="best-seller-box">
 
-                <h4>#{idx+1} 🏪 {item['Vendor']}</h4>
+                <h4>{idx+1}. 🏪 {item['Vendor']}</h4>
 
                 <p><b>{item['Food']}</b></p>
 
@@ -547,15 +554,11 @@ for tab, vendor in zip(tabs, vendors):
 
         foods = meal_data[vendor]
 
-        # DROPDOWN
-
         selected_food = st.selectbox(
             f"Select Food Item - {vendor}",
             foods,
             key=f"dropdown_{vendor}"
         )
-
-        # FOOD KEY
 
         key = f"{selected_meal}|{vendor}|{selected_food}"
 
@@ -568,8 +571,6 @@ for tab, vendor in zip(tabs, vendors):
         )
 
         stars = "⭐" * int(round(avg_rating))
-
-        # FOOD CARD
 
         st.markdown(
             f"""
@@ -591,14 +592,12 @@ for tab, vendor in zip(tabs, vendors):
             unsafe_allow_html=True
         )
 
-        # STAR RATING
+        st.markdown("### Tap Stars To Rate")
 
         user_rating = st.feedback(
             "stars",
             key=f"feedback_{key}"
         )
-
-        # BUTTON
 
         if st.button(
             f"Submit Rating for {selected_food}",
