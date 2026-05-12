@@ -73,7 +73,7 @@ st.markdown("""
     background-color: white;
     padding: 18px;
     border-radius: 15px;
-    border-left: 8px solid #ff9800;
+    border-left: 8px solid #E20031;
     margin-bottom: 15px;
     box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
 }
@@ -372,6 +372,22 @@ def save_data(data):
 ratings_data = load_data()
 
 # ---------------------------------------------------
+# RESET BUTTON
+# ---------------------------------------------------
+
+st.sidebar.markdown("## ⚙️ Controls")
+
+if st.sidebar.button("🔄 Reset All Ratings"):
+
+    ratings_data = initialize_ratings()
+
+    save_data(ratings_data)
+
+    st.sidebar.success("All ratings have been reset.")
+
+    st.rerun()
+
+# ---------------------------------------------------
 # CURRENT MEAL
 # ---------------------------------------------------
 
@@ -434,7 +450,7 @@ search_query = st.text_input(
 )
 
 # ---------------------------------------------------
-# SIDEBAR
+# SIDEBAR FILTER
 # ---------------------------------------------------
 
 st.sidebar.title("🍽 Meal Filters")
@@ -448,7 +464,7 @@ selected_meal = st.sidebar.selectbox(
 meal_data = default_data[selected_meal]
 
 # ---------------------------------------------------
-# TOP 5
+# TOP 5 HIGHEST RATED
 # ---------------------------------------------------
 
 st.markdown("## 🏆 Top 5 Highest Rated Dishes")
@@ -462,6 +478,7 @@ for vendor, foods in meal_data.items():
         key = f"{selected_meal}|{vendor}|{food}"
 
         total_rating = ratings_data[key]["total_rating"]
+
         votes = ratings_data[key]["votes"]
 
         avg_rating = (
@@ -496,8 +513,6 @@ for idx, dish in enumerate(top_dishes[:5], start=1):
 
         <p><b>Rating:</b> {stars} ({dish['Rating']}/5)</p>
 
-        <p><b>Total Votes:</b> {dish['Votes']}</p>
-
         </div>
         """,
         unsafe_allow_html=True
@@ -522,6 +537,7 @@ for vendor, foods in meal_data.items():
         key = f"{selected_meal}|{vendor}|{food}"
 
         votes = ratings_data[key]["votes"]
+
         total_rating = ratings_data[key]["total_rating"]
 
         avg_rating = (
@@ -545,9 +561,7 @@ for vendor, foods in meal_data.items():
 
         <p><b>Best Selling:</b> {best_food}</p>
 
-        <p><b>Rating:</b> {stars} ({best_rating}/5)</p>
-
-        <p><b>Total Orders/Ratings:</b> {best_votes}</p>
+        <p><b>Average Rating:</b> {stars} ({best_rating}/5)</p>
 
         </div>
         """,
@@ -590,6 +604,7 @@ for tab, vendor in zip(tabs, vendors):
             key = f"{selected_meal}|{vendor}|{food}"
 
             total_rating = ratings_data[key]["total_rating"]
+
             votes = ratings_data[key]["votes"]
 
             avg_rating = (
