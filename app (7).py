@@ -534,7 +534,7 @@ st.markdown("---")
 # RATE FOOD
 # ---------------------------------------------------
 
-st.markdown("## ⭐ Rate The Food")
+st.markdown("## Rate The Food")
 
 vendors = list(meal_data.keys())
 
@@ -573,7 +573,7 @@ for tab, vendor in zip(tabs, vendors):
                     <h4>{food}</h4>
 
                     <p>
-                    ⭐ <b>Live Rating:</b>
+                    <b>Live Rating:</b>
                     {stars} ({avg_rating}/5)
                     </p>
 
