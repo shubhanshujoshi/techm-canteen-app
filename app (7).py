@@ -20,7 +20,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* Main Background */
+/* Background */
 
 .stApp {
     background-color: #f5f5f5;
@@ -56,7 +56,7 @@ st.markdown("""
     box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
 }
 
-/* Top Rated Cards */
+/* Top Rated */
 
 .top-rated-box {
     background-color: white;
@@ -67,7 +67,7 @@ st.markdown("""
     box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
 }
 
-/* Best Seller Cards */
+/* Best Seller */
 
 .best-seller-box {
     background-color: white;
@@ -108,7 +108,7 @@ st.markdown("""
     color: white;
 }
 
-/* Search Box */
+/* Search */
 
 .stTextInput > div > div > input {
     border: 2px solid #E20031;
@@ -338,17 +338,27 @@ def initialize_ratings():
 
 def load_data():
 
-    if os.path.exists(DATA_FILE):
+    fresh_data = initialize_ratings()
 
-        with open(DATA_FILE, "r") as f:
-            return json.load(f)
+    if not os.path.exists(DATA_FILE):
 
-    data = initialize_ratings()
+        with open(DATA_FILE, "w") as f:
+            json.dump(fresh_data, f)
+
+        return fresh_data
+
+    with open(DATA_FILE, "r") as f:
+        existing_data = json.load(f)
+
+    for key in existing_data:
+
+        if key in fresh_data:
+            fresh_data[key] = existing_data[key]
 
     with open(DATA_FILE, "w") as f:
-        json.dump(data, f)
+        json.dump(fresh_data, f)
 
-    return data
+    return fresh_data
 
 # ---------------------------------------------------
 # SAVE DATA
@@ -362,7 +372,7 @@ def save_data(data):
 ratings_data = load_data()
 
 # ---------------------------------------------------
-# CURRENT MEAL LOGIC
+# CURRENT MEAL
 # ---------------------------------------------------
 
 current_hour = datetime.now().hour
@@ -420,7 +430,7 @@ st.markdown("---")
 
 search_query = st.text_input(
     "🔍 Search Food Item",
-    placeholder="Search dosa, biryani, tea..."
+    placeholder="Search food items..."
 )
 
 # ---------------------------------------------------
@@ -438,7 +448,7 @@ selected_meal = st.sidebar.selectbox(
 meal_data = default_data[selected_meal]
 
 # ---------------------------------------------------
-# TOP 5 DISHES
+# TOP 5
 # ---------------------------------------------------
 
 st.markdown("## 🏆 Top 5 Highest Rated Dishes")
@@ -452,7 +462,6 @@ for vendor, foods in meal_data.items():
         key = f"{selected_meal}|{vendor}|{food}"
 
         total_rating = ratings_data[key]["total_rating"]
-
         votes = ratings_data[key]["votes"]
 
         avg_rating = (
@@ -473,9 +482,7 @@ top_dishes = sorted(
     reverse=True
 )
 
-top_5 = top_dishes[:5]
-
-for idx, dish in enumerate(top_5, start=1):
+for idx, dish in enumerate(top_dishes[:5], start=1):
 
     stars = "⭐" * int(round(dish["Rating"]))
 
@@ -515,7 +522,6 @@ for vendor, foods in meal_data.items():
         key = f"{selected_meal}|{vendor}|{food}"
 
         votes = ratings_data[key]["votes"]
-
         total_rating = ratings_data[key]["total_rating"]
 
         avg_rating = (
@@ -566,9 +572,7 @@ for tab, vendor in zip(tabs, vendors):
 
         foods = meal_data[vendor]
 
-        cols = st.columns(2)
-
-        visible_foods = []
+        filtered_foods = []
 
         for food in foods:
 
@@ -577,14 +581,15 @@ for tab, vendor in zip(tabs, vendors):
                 if search_query.lower() not in food.lower():
                     continue
 
-            visible_foods.append(food)
+            filtered_foods.append(food)
 
-        for index, food in enumerate(visible_foods):
+        cols = st.columns(2)
+
+        for index, food in enumerate(filtered_foods):
 
             key = f"{selected_meal}|{vendor}|{food}"
 
             total_rating = ratings_data[key]["total_rating"]
-
             votes = ratings_data[key]["votes"]
 
             avg_rating = (
@@ -592,7 +597,7 @@ for tab, vendor in zip(tabs, vendors):
                 if votes > 0 else 0
             )
 
-            display_stars = "⭐" * int(round(avg_rating))
+            stars = "⭐" * int(round(avg_rating))
 
             with cols[index % 2]:
 
@@ -604,7 +609,7 @@ for tab, vendor in zip(tabs, vendors):
 
                     <p>
                     ⭐ <b>Live Rating:</b>
-                    {display_stars} ({avg_rating}/5)
+                    {stars} ({avg_rating}/5)
                     </p>
 
                     <p>
