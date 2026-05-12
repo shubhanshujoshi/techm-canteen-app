@@ -253,7 +253,7 @@ ratings_data = load_data()
 
 st.sidebar.markdown("## ⚙️ Controls")
 
-if st.sidebar.button("🔄 Reset All Ratings"):
+if st.sidebar.button("Reset All Ratings"):
 
     ratings_data = initialize_ratings()
 
@@ -289,7 +289,7 @@ auto_meal = get_current_meal()
 # SIDEBAR
 # ---------------------------------------------------
 
-st.sidebar.title("🍽 Meal Filters")
+st.sidebar.title("Meal Filters")
 
 selected_meal = st.sidebar.selectbox(
     "Select Meal Time",
