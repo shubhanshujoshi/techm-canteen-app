@@ -371,7 +371,7 @@ st.markdown("---")
 # ---------------------------------------------------
 
 search_query = st.text_input(
-    "🔍 Search Food Item",
+    " Search Food Item",
     placeholder="Search dosa, biryani, tea..."
 )
 
