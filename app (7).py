@@ -51,9 +51,9 @@ st.markdown("""
     background-color: white;
     padding: 20px;
     border-radius: 18px;
-    border-top: 6px solid #E20031;
+    border-top: 5px solid #E20031;
     margin-bottom: 20px;
-    box-shadow: 0px 3px 12px rgba(0,0,0,0.08);
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
 }
 
 /* Top Rated Cards */
@@ -64,10 +64,21 @@ st.markdown("""
     border-radius: 15px;
     border-left: 8px solid #E20031;
     margin-bottom: 15px;
-    box-shadow: 0px 3px 12px rgba(0,0,0,0.08);
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
 }
 
-/* Vendor Tabs */
+/* Best Seller Cards */
+
+.best-seller-box {
+    background-color: white;
+    padding: 18px;
+    border-radius: 15px;
+    border-left: 8px solid #ff9800;
+    margin-bottom: 15px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Tabs */
 
 .stTabs [data-baseweb="tab"] {
     font-size: 18px;
@@ -139,25 +150,32 @@ default_data = {
             "Idli",
             "Dosa",
             "Coffee",
-            "Vada"
+            "Vada",
+            "Pongal"
         ],
 
         "Vendor C": [
             "Paratha",
             "Curd",
-            "Tea"
+            "Tea",
+            "Aloo Puri",
+            "Lassi"
         ],
 
         "Vendor D": [
             "Bread Omelette",
             "Boiled Eggs",
-            "Tea"
+            "Tea",
+            "Maggi",
+            "Milk"
         ],
 
         "Vendor E": [
             "Cornflakes",
             "Milk",
-            "Banana Shake"
+            "Banana Shake",
+            "Oats",
+            "Fruit Bowl"
         ]
     },
 
@@ -166,31 +184,41 @@ default_data = {
         "Vendor A": [
             "Dal Rice",
             "Paneer Butter Masala",
-            "Roti"
+            "Roti",
+            "Veg Pulao",
+            "Salad"
         ],
 
         "Vendor B": [
             "Biryani",
             "Raita",
-            "Cold Drink"
+            "Cold Drink",
+            "Chicken Curry",
+            "Naan"
         ],
 
         "Vendor C": [
             "Rajma Chawal",
             "Salad",
-            "Papad"
+            "Papad",
+            "Mix Veg",
+            "Jeera Rice"
         ],
 
         "Vendor D": [
             "Fried Rice",
             "Manchurian",
-            "Noodles"
+            "Noodles",
+            "Spring Roll",
+            "Soup"
         ],
 
         "Vendor E": [
-            "Chicken Curry",
+            "Butter Chicken",
             "Jeera Rice",
-            "Roti"
+            "Roti",
+            "Dal Makhani",
+            "Paneer Tikka"
         ]
     },
 
@@ -199,31 +227,41 @@ default_data = {
         "Vendor A": [
             "Samosa",
             "Tea",
-            "Coffee"
+            "Coffee",
+            "Burger",
+            "French Fries"
         ],
 
         "Vendor B": [
             "Puff",
             "Cold Coffee",
-            "Burger"
+            "Burger",
+            "Pizza Slice",
+            "Momos"
         ],
 
         "Vendor C": [
             "Momos",
             "Spring Roll",
-            "Tea"
+            "Tea",
+            "Sandwich",
+            "Cold Drink"
         ],
 
         "Vendor D": [
             "French Fries",
             "Pizza Slice",
-            "Pepsi"
+            "Pepsi",
+            "Pasta",
+            "Garlic Bread"
         ],
 
         "Vendor E": [
             "Pasta",
             "Garlic Bread",
-            "Milkshake"
+            "Milkshake",
+            "Brownie",
+            "Nachos"
         ]
     },
 
@@ -232,31 +270,41 @@ default_data = {
         "Vendor A": [
             "Dal Tadka",
             "Roti",
-            "Rice"
+            "Rice",
+            "Kheer",
+            "Paneer Curry"
         ],
 
         "Vendor B": [
             "Kadhai Paneer",
             "Naan",
-            "Lassi"
+            "Lassi",
+            "Butter Chicken",
+            "Soup"
         ],
 
         "Vendor C": [
             "Khichdi",
             "Curd",
-            "Pickle"
+            "Pickle",
+            "Veg Curry",
+            "Rice"
         ],
 
         "Vendor D": [
             "Hakka Noodles",
             "Soup",
-            "Manchurian"
+            "Manchurian",
+            "Fried Rice",
+            "Spring Roll"
         ],
 
         "Vendor E": [
             "Butter Chicken",
             "Rice",
-            "Roti"
+            "Roti",
+            "Dal Fry",
+            "Ice Cream"
         ]
     }
 }
@@ -367,7 +415,7 @@ with col2:
 st.markdown("---")
 
 # ---------------------------------------------------
-# SEARCH BAR
+# SEARCH
 # ---------------------------------------------------
 
 search_query = st.text_input(
@@ -390,7 +438,7 @@ selected_meal = st.sidebar.selectbox(
 meal_data = default_data[selected_meal]
 
 # ---------------------------------------------------
-# TOP 5 HIGHEST RATED
+# TOP 5 DISHES
 # ---------------------------------------------------
 
 st.markdown("## 🏆 Top 5 Highest Rated Dishes")
@@ -451,6 +499,58 @@ for idx, dish in enumerate(top_5, start=1):
 st.markdown("---")
 
 # ---------------------------------------------------
+# BEST SELLERS
+# ---------------------------------------------------
+
+st.markdown("## 🔥 Best Selling Dish Of Each Vendor")
+
+for vendor, foods in meal_data.items():
+
+    best_food = None
+    best_votes = -1
+    best_rating = 0
+
+    for food in foods:
+
+        key = f"{selected_meal}|{vendor}|{food}"
+
+        votes = ratings_data[key]["votes"]
+
+        total_rating = ratings_data[key]["total_rating"]
+
+        avg_rating = (
+            round(total_rating / votes, 1)
+            if votes > 0 else 0
+        )
+
+        if votes > best_votes:
+
+            best_votes = votes
+            best_food = food
+            best_rating = avg_rating
+
+    stars = "⭐" * int(round(best_rating))
+
+    st.markdown(
+        f"""
+        <div class="best-seller-box">
+
+        <h3>🏪 {vendor}</h3>
+
+        <p><b>Best Selling:</b> {best_food}</p>
+
+        <p><b>Rating:</b> {stars} ({best_rating}/5)</p>
+
+        <p><b>Total Orders/Ratings:</b> {best_votes}</p>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+st.markdown("---")
+
+# ---------------------------------------------------
 # VENDOR TABS
 # ---------------------------------------------------
 
@@ -468,14 +568,18 @@ for tab, vendor in zip(tabs, vendors):
 
         cols = st.columns(2)
 
-        for index, food in enumerate(foods):
+        visible_foods = []
 
-            # SEARCH FILTER
+        for food in foods:
 
             if search_query:
 
                 if search_query.lower() not in food.lower():
                     continue
+
+            visible_foods.append(food)
+
+        for index, food in enumerate(visible_foods):
 
             key = f"{selected_meal}|{vendor}|{food}"
 
@@ -492,61 +596,57 @@ for tab, vendor in zip(tabs, vendors):
 
             with cols[index % 2]:
 
-                with st.container():
+                st.markdown(
+                    f"""
+                    <div class="food-card">
 
-                    st.markdown(
-                        '<div class="food-card">',
-                        unsafe_allow_html=True
-                    )
+                    <h3>{food}</h3>
 
-                    st.subheader(food)
+                    <p>
+                    ⭐ <b>Live Rating:</b>
+                    {display_stars} ({avg_rating}/5)
+                    </p>
 
-                    st.write(
-                        f"⭐ Live Rating: {display_stars} ({avg_rating}/5)"
-                    )
+                    <p>
+                    👥 <b>Total Votes:</b> {votes}
+                    </p>
 
-                    st.write(f"👥 Total Votes: {votes}")
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
-                    # STAR RATING
+                user_rating = st.feedback(
+                    "stars",
+                    key=f"feedback_{key}"
+                )
 
-                    user_rating = st.feedback(
-                        "stars",
-                        key=f"feedback_{key}"
-                    )
+                if st.button(
+                    "Submit Rating",
+                    key=f"btn_{key}"
+                ):
 
-                    # SUBMIT BUTTON
+                    if user_rating is not None:
 
-                    if st.button(
-                        "Submit Rating",
-                        key=f"btn_{key}"
-                    ):
+                        ratings_data[key]["total_rating"] += (
+                            user_rating + 1
+                        )
 
-                        if user_rating is not None:
+                        ratings_data[key]["votes"] += 1
 
-                            ratings_data[key]["total_rating"] += (
-                                user_rating + 1
-                            )
+                        save_data(ratings_data)
 
-                            ratings_data[key]["votes"] += 1
+                        st.success(
+                            f"You rated {food} {user_rating + 1}⭐"
+                        )
 
-                            save_data(ratings_data)
+                        st.rerun()
 
-                            st.success(
-                                f"You rated {food} {user_rating + 1}⭐"
-                            )
+                    else:
 
-                            st.rerun()
-
-                        else:
-
-                            st.warning(
-                                "Please select stars before submitting."
-                            )
-
-                    st.markdown(
-                        '</div>',
-                        unsafe_allow_html=True
-                    )
+                        st.warning(
+                            "Please select stars before submitting."
+                        )
 
 # ---------------------------------------------------
 # FOOTER
