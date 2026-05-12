@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -10,12 +9,20 @@ import os
 # ---------------------------------------------------
 
 st.set_page_config(
-    page_title="Tech Mahindra Canteen Live Ratings",
+    page_title="Tech Mahindra Smart Canteen",
     page_icon="🍽️",
     layout="wide"
 )
 
+# ---------------------------------------------------
+# DATA FILE
+# ---------------------------------------------------
+
 DATA_FILE = "ratings_data.json"
+
+# ---------------------------------------------------
+# FOOD DATA
+# ---------------------------------------------------
 
 default_data = {
     "Breakfast": {
@@ -25,6 +32,7 @@ default_data = {
         "Vendor D": ["Bread Omelette", "Boiled Eggs", "Tea"],
         "Vendor E": ["Cornflakes", "Milk", "Banana Shake"]
     },
+
     "Lunch": {
         "Vendor A": ["Dal Rice", "Paneer Butter Masala", "Roti"],
         "Vendor B": ["Biryani", "Raita", "Cold Drink"],
@@ -32,6 +40,7 @@ default_data = {
         "Vendor D": ["Fried Rice", "Manchurian", "Noodles"],
         "Vendor E": ["Chicken Curry", "Jeera Rice", "Roti"]
     },
+
     "Snacks": {
         "Vendor A": ["Samosa", "Tea", "Coffee"],
         "Vendor B": ["Puff", "Cold Coffee", "Burger"],
@@ -39,6 +48,7 @@ default_data = {
         "Vendor D": ["French Fries", "Pizza Slice", "Pepsi"],
         "Vendor E": ["Pasta", "Garlic Bread", "Milkshake"]
     },
+
     "Dinner": {
         "Vendor A": ["Dal Tadka", "Roti", "Rice"],
         "Vendor B": ["Kadhai Paneer", "Naan", "Lassi"],
@@ -48,12 +58,20 @@ default_data = {
     }
 }
 
+# ---------------------------------------------------
+# INITIALIZE RATINGS
+# ---------------------------------------------------
+
 def initialize_ratings():
+
     ratings = {}
 
     for meal, vendors in default_data.items():
+
         for vendor, foods in vendors.items():
+
             for food in foods:
+
                 key = f"{meal}|{vendor}|{food}"
 
                 ratings[key] = {
@@ -63,8 +81,15 @@ def initialize_ratings():
 
     return ratings
 
+
+# ---------------------------------------------------
+# LOAD DATA
+# ---------------------------------------------------
+
 def load_data():
+
     if os.path.exists(DATA_FILE):
+
         with open(DATA_FILE, "r") as f:
             return json.load(f)
 
@@ -75,35 +100,64 @@ def load_data():
 
     return data
 
+
+# ---------------------------------------------------
+# SAVE DATA
+# ---------------------------------------------------
+
 def save_data(data):
+
     with open(DATA_FILE, "w") as f:
         json.dump(data, f)
 
+
 ratings_data = load_data()
+
+# ---------------------------------------------------
+# CURRENT MEAL LOGIC
+# ---------------------------------------------------
 
 current_hour = datetime.now().hour
 
 def get_current_meal():
+
     if 6 <= current_hour < 11:
         return "Breakfast"
+
     elif 11 <= current_hour < 16:
         return "Lunch"
+
     elif 16 <= current_hour < 19:
         return "Snacks"
+
     else:
         return "Dinner"
 
+
 current_meal = get_current_meal()
 
+# ---------------------------------------------------
+# HEADER
+# ---------------------------------------------------
+
 st.title("🍽️ Tech Mahindra Smart Canteen")
+
 st.subheader(f"Currently Serving: {current_meal}")
+
+# ---------------------------------------------------
+# SEARCH BAR
+# ---------------------------------------------------
 
 search_query = st.text_input(
     "🔍 Search Food Item",
     placeholder="Search for dosa, biryani, tea..."
 )
 
-st.sidebar.title("Filters")
+# ---------------------------------------------------
+# SIDEBAR FILTER
+# ---------------------------------------------------
+
+st.sidebar.title("Meal Filters")
 
 selected_meal = st.sidebar.selectbox(
     "Select Meal Time",
@@ -113,17 +167,13 @@ selected_meal = st.sidebar.selectbox(
 
 meal_data = default_data[selected_meal]
 
-for vendor, foods in meal_data.items():
-
-    # ---------------------------------------------------
-# TOP 5 DISHES SECTION
+# ---------------------------------------------------
+# TOP RATED DISHES
 # ---------------------------------------------------
 
-st.markdown("## 🏆 Top Rated Dishes Right Now")
+st.markdown("## 🏆 Top 5 Highest Rated Dishes")
 
 top_dishes = []
-
-meal_data = default_data[selected_meal]
 
 for vendor, foods in meal_data.items():
 
@@ -134,7 +184,10 @@ for vendor, foods in meal_data.items():
         total_rating = ratings_data[key]["total_rating"]
         votes = ratings_data[key]["votes"]
 
-        avg_rating = round(total_rating / votes, 1) if votes > 0 else 0
+        avg_rating = (
+            round(total_rating / votes, 1)
+            if votes > 0 else 0
+        )
 
         top_dishes.append({
             "Food": food,
@@ -143,7 +196,7 @@ for vendor, foods in meal_data.items():
             "Votes": votes
         })
 
-# Sort by rating then votes
+# Sort dishes by rating and votes
 top_dishes = sorted(
     top_dishes,
     key=lambda x: (x["Rating"], x["Votes"]),
@@ -185,13 +238,17 @@ for tab, vendor in zip(tabs, vendors):
 
         for index, food in enumerate(foods):
 
+            # SEARCH FILTER
+
             if search_query:
+
                 if search_query.lower() not in food.lower():
                     continue
 
             key = f"{selected_meal}|{vendor}|{food}"
 
             total_rating = ratings_data[key]["total_rating"]
+
             votes = ratings_data[key]["votes"]
 
             avg_rating = (
@@ -204,7 +261,10 @@ for tab, vendor in zip(tabs, vendors):
                 st.subheader(food)
 
                 st.write(f"⭐ Live Rating: **{avg_rating}/5**")
+
                 st.write(f"👥 Total Votes: {votes}")
+
+                # RATING SLIDER
 
                 user_rating = st.slider(
                     f"Rate {food}",
@@ -214,12 +274,15 @@ for tab, vendor in zip(tabs, vendors):
                     key=f"slider_{key}"
                 )
 
+                # SUBMIT BUTTON
+
                 if st.button(
                     f"Submit Rating for {food}",
                     key=f"btn_{key}"
                 ):
 
                     ratings_data[key]["total_rating"] += user_rating
+
                     ratings_data[key]["votes"] += 1
 
                     save_data(ratings_data)
@@ -229,3 +292,13 @@ for tab, vendor in zip(tabs, vendors):
                     )
 
                     st.rerun()
+
+# ---------------------------------------------------
+# FOOTER
+# ---------------------------------------------------
+
+st.markdown("---")
+
+st.caption(
+    "Built for Tech Mahindra Canteen Management System"
+)
