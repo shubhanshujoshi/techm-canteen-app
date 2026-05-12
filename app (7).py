@@ -64,21 +64,6 @@ html, body, [class*="css"] {
     }
 }
 
-/* Header Container */
-
-.header-container {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 10px;
-}
-
-/* Logo */
-
-.logo-img {
-    width: 55px;
-}
-
 /* Main Title */
 
 .main-title {
@@ -159,18 +144,8 @@ section[data-testid="stSidebar"] {
 
 @media (max-width: 768px) {
 
-    .header-container {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
     .main-title {
-        font-size: 24px;
-    }
-
-    .logo-img {
-        width: 50px;
+        font-size: 22px;
     }
 }
 
@@ -342,9 +317,7 @@ meal_data = default_data[selected_meal]
 # HEADER
 # ---------------------------------------------------
 
-
-
-col1, col2 = st.columns([1, 8])
+col1, col2 = st.columns([1, 7])
 
 with col1:
     st.image("logo.png", width=55)
@@ -372,95 +345,125 @@ with col2:
 st.markdown("---")
 
 # ---------------------------------------------------
-# SEARCH
+# SEARCH SECTION
 # ---------------------------------------------------
+
+st.markdown("## 🔍 Search Food Items")
+
+all_food_items = []
+
+for meal, vendors in default_data.items():
+
+    for vendor, foods in vendors.items():
+
+        for food in foods:
+
+            all_food_items.append({
+                "food": food,
+                "meal": meal,
+                "vendor": vendor
+            })
 
 search_query = st.text_input(
-    "🔍 Search Food Item",
-    placeholder="Search all food items..."
+    "Search food item",
+    placeholder="Type dosa, biryani, tea..."
 )
 
-# ---------------------------------------------------
-# SEARCH RESULTS
-# ---------------------------------------------------
+matching_foods = []
 
 if search_query:
 
-    st.markdown("## 🔎 Search Results")
+    for item in all_food_items:
 
-    found = False
+        if search_query.lower() in item["food"].lower():
 
-    for meal, vendors in default_data.items():
+            matching_foods.append(
+                f"{item['food']} | {item['vendor']} | {item['meal']}"
+            )
 
-        for vendor, foods in vendors.items():
+matching_foods = list(dict.fromkeys(matching_foods))
 
-            for food in foods:
+selected_food = None
 
-                if search_query.lower() in food.lower():
+if matching_foods:
 
-                    found = True
+    selected_food = st.selectbox(
+        "Suggestions",
+        matching_foods
+    )
 
-                    key = f"{meal}|{vendor}|{food}"
+if selected_food:
 
-                    total_rating = ratings_data[key]["total_rating"]
+    selected_food_name = selected_food.split(" | ")[0]
+    selected_vendor = selected_food.split(" | ")[1]
+    selected_meal_name = selected_food.split(" | ")[2]
 
-                    votes = ratings_data[key]["votes"]
+    key = (
+        f"{selected_meal_name}|"
+        f"{selected_vendor}|"
+        f"{selected_food_name}"
+    )
 
-                    avg_rating = (
-                        round(total_rating / votes, 1)
-                        if votes > 0 else 0
-                    )
+    total_rating = ratings_data[key]["total_rating"]
+    votes = ratings_data[key]["votes"]
 
-                    stars = "⭐" * int(round(avg_rating))
+    avg_rating = (
+        round(total_rating / votes, 1)
+        if votes > 0 else 0
+    )
 
-                    st.markdown(
-                        f"""
-                        <div class="search-card">
+    stars = "⭐" * int(round(avg_rating))
 
-                        <h4>🍽️ {food}</h4>
+    st.markdown(
+        f"""
+        <div class="search-card">
 
-                        <p><b>Meal:</b> {meal}</p>
+        <h3>🍽️ {selected_food_name}</h3>
 
-                        <p><b>Vendor:</b> {vendor}</p>
+        <p><b>Vendor:</b> {selected_vendor}</p>
 
-                        <p>
-                        ⭐ <b>Rating:</b>
-                        {stars} ({avg_rating}/5)
-                        </p>
+        <p><b>Meal:</b> {selected_meal_name}</p>
 
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+        <p>
+        ⭐ <b>Live Rating:</b>
+        {stars} ({avg_rating}/5)
+        </p>
 
-                    user_rating = st.feedback(
-                        "stars",
-                        key=f"search_{key}"
-                    )
+        <p>
+        👥 <b>Total Votes:</b> {votes}
+        </p>
 
-                    if st.button(
-                        f"Submit Rating for {food}",
-                        key=f"search_btn_{key}"
-                    ):
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-                        if user_rating is not None:
+    user_rating = st.feedback(
+        "stars",
+        key=f"search_feedback_{key}"
+    )
 
-                            ratings_data[key]["total_rating"] += (
-                                user_rating + 1
-                            )
+    if st.button(
+        f"Submit Rating for {selected_food_name}",
+        key=f"search_btn_{key}"
+    ):
 
-                            ratings_data[key]["votes"] += 1
+        if user_rating is not None:
 
-                            save_data(ratings_data)
+            ratings_data[key]["total_rating"] += (
+                user_rating + 1
+            )
 
-                            st.success(
-                                f"You rated {food} {user_rating + 1}⭐"
-                            )
+            ratings_data[key]["votes"] += 1
 
-                            st.rerun()
+            save_data(ratings_data)
 
-    if not found:
-        st.warning("No food item found.")
+            st.success(
+                f"You rated {selected_food_name} "
+                f"{user_rating + 1}⭐"
+            )
+
+            st.rerun()
 
 st.markdown("---")
 
@@ -479,7 +482,6 @@ for vendor, foods in meal_data.items():
         key = f"{selected_meal}|{vendor}|{food}"
 
         total_rating = ratings_data[key]["total_rating"]
-
         votes = ratings_data[key]["votes"]
 
         avg_rating = (
@@ -537,7 +539,6 @@ for vendor, foods in meal_data.items():
         key = f"{selected_meal}|{vendor}|{food}"
 
         votes = ratings_data[key]["votes"]
-
         total_rating = ratings_data[key]["total_rating"]
 
         avg_rating = (
@@ -576,10 +577,6 @@ st.markdown("---")
 
 st.markdown("## ⭐ Rate The Food")
 
-# ---------------------------------------------------
-# VENDOR TABS
-# ---------------------------------------------------
-
 vendors = list(meal_data.keys())
 
 tabs = st.tabs(vendors)
@@ -599,7 +596,6 @@ for tab, vendor in zip(tabs, vendors):
             key = f"{selected_meal}|{vendor}|{food}"
 
             total_rating = ratings_data[key]["total_rating"]
-
             votes = ratings_data[key]["votes"]
 
             avg_rating = (
