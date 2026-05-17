@@ -9,7 +9,7 @@ import os
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
-    page_icon="logo.png",
+    page_icon="🍽️",
     layout="wide"
 )
 
@@ -21,12 +21,11 @@ st.markdown("""
 <style>
 
 html, body, [class*="css"] {
-    font-family: Aptos, "Segoe UI", sans-serif;
+    font-family: "Segoe UI", sans-serif;
 }
 
 .stApp {
     background-color: #f5f5f5;
-    color: #111111;
 }
 
 /* DARK MODE */
@@ -35,20 +34,10 @@ html, body, [class*="css"] {
 
     .stApp {
         background-color: #111111 !important;
-        color: white !important;
     }
 
     p, h1, h2, h3, h4, h5, h6, label, div {
         color: white !important;
-    }
-
-    .food-card {
-        background-color: #1e1e1e !important;
-        color: white !important;
-    }
-
-    section[data-testid="stSidebar"] {
-        background-color: #1a1a1a !important;
     }
 }
 
@@ -58,49 +47,13 @@ html, body, [class*="css"] {
     background: linear-gradient(90deg, #E20031, #ff4d6d);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-size: 32px;
+    font-size: 34px;
     font-weight: 700;
 }
 
-/* SUBTITLE */
-
 .sub-title {
-    color: #666666;
-    font-size: 15px;
-}
-
-/* CARDS */
-
-.food-card {
-    background-color: white;
-    padding: 18px;
-    border-radius: 18px;
-    border-top: 5px solid #E20031;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
-    min-width: 240px;
-    max-width: 240px;
-    margin-right: 16px;
-    flex-shrink: 0;
-    text-align: center;
-}
-
-/* HORIZONTAL SCROLL */
-
-.scroll-container {
-    display: flex;
-    overflow-x: auto;
-    gap: 16px;
-    padding-bottom: 12px;
-    scroll-behavior: smooth;
-}
-
-.scroll-container::-webkit-scrollbar {
-    height: 8px;
-}
-
-.scroll-container::-webkit-scrollbar-thumb {
-    background: #E20031;
-    border-radius: 10px;
+    font-size: 16px;
+    color: #666;
 }
 
 /* BUTTONS */
@@ -130,13 +83,10 @@ html, body, [class*="css"] {
 
 @media (max-width: 768px) {
 
-    .food-card {
-        min-width: 85%;
-    }
-
     .main-title {
         font-size: 24px;
     }
+
 }
 
 </style>
@@ -248,10 +198,8 @@ def save_data(data):
 ratings_data = load_data()
 
 # ---------------------------------------------------
-# SIDEBAR
+# CURRENT MEAL
 # ---------------------------------------------------
-
-st.sidebar.title("Meal Filters")
 
 current_hour = datetime.now().hour
 
@@ -259,14 +207,23 @@ def get_current_meal():
 
     if 6 <= current_hour < 11:
         return "Breakfast"
+
     elif 11 <= current_hour < 16:
         return "Lunch"
+
     elif 16 <= current_hour < 19:
         return "Snacks"
+
     else:
         return "Dinner"
 
 auto_meal = get_current_meal()
+
+# ---------------------------------------------------
+# SIDEBAR
+# ---------------------------------------------------
+
+st.sidebar.title("Meal Filters")
 
 selected_meal = st.sidebar.selectbox(
     "Select Meal Time",
@@ -283,7 +240,7 @@ meal_data = default_data[selected_meal]
 col1, col2 = st.columns([1, 7])
 
 with col1:
-    st.image("logo.png", width=60)
+    st.markdown("## 🍽️")
 
 with col2:
 
@@ -338,29 +295,45 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-cards_html = '<div class="scroll-container">'
+top_html = """
+<div style="
+display:flex;
+overflow-x:auto;
+gap:16px;
+padding-bottom:12px;
+">
+"""
 
 for idx, dish in enumerate(top_dishes):
 
     stars = "⭐" * int(round(dish["rating"]))
 
-    cards_html += f"""
-    <div class="food-card">
+    top_html += f"""
+    <div style="
+        min-width:250px;
+        background:white;
+        border-radius:18px;
+        padding:20px;
+        border-top:5px solid #E20031;
+        box-shadow:0 4px 12px rgba(0,0,0,0.08);
+        text-align:center;
+        flex-shrink:0;
+    ">
 
         <h3>{idx+1}. {dish['food']}</h3>
 
         <p><b>{dish['vendor']}</b></p>
 
-        <h4>{stars}</h4>
+        <h2>{stars}</h2>
 
         <p>{dish['rating']}/5</p>
 
     </div>
     """
 
-cards_html += "</div>"
+top_html += "</div>"
 
-st.markdown(cards_html, unsafe_allow_html=True)
+st.markdown(top_html, unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -368,7 +341,7 @@ st.markdown("---")
 # FEEDBACK SECTION
 # ---------------------------------------------------
 
-st.markdown("## Recent Food Feedback")
+st.markdown("## Food Feedback")
 
 vendors = list(meal_data.keys())
 
@@ -381,20 +354,20 @@ for tab, vendor in zip(tabs, vendors):
         foods = meal_data[vendor]
 
         selected_food = st.selectbox(
-            f"Select Food From {vendor}",
+            f"Select Food - {vendor}",
             foods,
             key=f"feedback_food_{vendor}"
         )
 
         feedback_text = st.text_area(
             "Write Your Feedback",
-            placeholder="Tell us about the food quality, taste, hygiene etc.",
+            placeholder="Taste, quality, hygiene, service etc.",
             key=f"text_{vendor}"
         )
 
         if st.button(
             f"Submit Feedback - {vendor}",
-            key=f"submit_feedback_{vendor}"
+            key=f"feedback_btn_{vendor}"
         ):
 
             feedback_data = []
@@ -438,7 +411,6 @@ for vendor, foods in meal_data.items():
         key = f"{selected_meal}|{vendor}|{food}"
 
         votes = ratings_data[key]["votes"]
-
         total_rating = ratings_data[key]["total_rating"]
 
         avg = round(total_rating / votes, 1) if votes > 0 else 0
@@ -456,20 +428,36 @@ for vendor, foods in meal_data.items():
         "votes": best_votes
     })
 
-seller_html = '<div class="scroll-container">'
+seller_html = """
+<div style="
+display:flex;
+overflow-x:auto;
+gap:16px;
+padding-bottom:12px;
+">
+"""
 
 for item in best_sellers:
 
     stars = "⭐" * int(round(item["rating"]))
 
     seller_html += f"""
-    <div class="food-card">
+    <div style="
+        min-width:250px;
+        background:white;
+        border-radius:18px;
+        padding:20px;
+        border-top:5px solid #E20031;
+        box-shadow:0 4px 12px rgba(0,0,0,0.08);
+        text-align:center;
+        flex-shrink:0;
+    ">
 
         <h3>{item['vendor']}</h3>
 
         <p><b>{item['food']}</b></p>
 
-        <h4>{stars}</h4>
+        <h2>{stars}</h2>
 
         <p>{item['rating']}/5</p>
 
@@ -507,7 +495,6 @@ for tab, vendor in zip(tabs, vendors):
         key = f"{selected_meal}|{vendor}|{selected_food}"
 
         total_rating = ratings_data[key]["total_rating"]
-
         votes = ratings_data[key]["votes"]
 
         avg = round(total_rating / votes, 1) if votes > 0 else 0
@@ -516,13 +503,22 @@ for tab, vendor in zip(tabs, vendors):
 
         st.markdown(
             f"""
-            <div class="food-card">
+            <div style="
+                background:white;
+                padding:20px;
+                border-radius:18px;
+                border-top:5px solid #E20031;
+                box-shadow:0 4px 12px rgba(0,0,0,0.08);
+                text-align:center;
+                margin-top:15px;
+                margin-bottom:20px;
+            ">
 
                 <h3>{selected_food}</h3>
 
-                <p>{stars}</p>
+                <h2>{stars}</h2>
 
-                <p>{avg}/5 Rating</p>
+                <p><b>{avg}/5 Rating</b></p>
 
                 <p>{votes} Votes</p>
 
