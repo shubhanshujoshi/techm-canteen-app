@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 # =====================================================
-# CUSTOM CSS
+# CSS
 # =====================================================
 
 st.markdown("""
@@ -24,8 +24,6 @@ html, body, [class*="css"] {
     font-family: "Segoe UI", sans-serif;
 }
 
-/* APP */
-
 .stApp {
     background-color: #f5f5f5;
 }
@@ -33,7 +31,7 @@ html, body, [class*="css"] {
 /* TITLE */
 
 .main-title {
-    font-size: 34px;
+    font-size: 36px;
     font-weight: 700;
     background: linear-gradient(90deg, #E20031, #ff4d6d);
     -webkit-background-clip: text;
@@ -41,7 +39,7 @@ html, body, [class*="css"] {
 }
 
 .sub-title {
-    color: #666;
+    color: #666666;
     font-size: 16px;
 }
 
@@ -50,14 +48,34 @@ html, body, [class*="css"] {
 .card {
     background: white;
     border-radius: 18px;
-    padding: 20px;
+    padding: 18px;
     border-top: 5px solid #E20031;
     box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
     text-align: center;
-    margin-bottom: 10px;
+    min-width: 240px;
+    flex-shrink: 0;
 }
 
-/* BUTTON */
+/* SCROLL ROW */
+
+.scroll-row {
+    display: flex;
+    overflow-x: auto;
+    gap: 16px;
+    padding-bottom: 10px;
+    scroll-behavior: smooth;
+}
+
+.scroll-row::-webkit-scrollbar {
+    height: 8px;
+}
+
+.scroll-row::-webkit-scrollbar-thumb {
+    background: #E20031;
+    border-radius: 10px;
+}
+
+/* BUTTONS */
 
 .stButton > button {
     background-color: #E20031;
@@ -73,7 +91,7 @@ html, body, [class*="css"] {
     color: white;
 }
 
-/* STARS */
+/* BIGGER STARS */
 
 [data-testid="stFeedback"] button {
     transform: scale(1.7);
@@ -85,7 +103,11 @@ html, body, [class*="css"] {
 @media (max-width: 768px) {
 
     .main-title {
-        font-size: 24px;
+        font-size: 26px;
+    }
+
+    .card {
+        min-width: 85%;
     }
 
 }
@@ -94,7 +116,7 @@ html, body, [class*="css"] {
 """, unsafe_allow_html=True)
 
 # =====================================================
-# DATA FILES
+# FILES
 # =====================================================
 
 DATA_FILE = "ratings_data.json"
@@ -140,7 +162,7 @@ default_data = {
 }
 
 # =====================================================
-# INITIALIZE RATINGS
+# INITIALIZE
 # =====================================================
 
 def initialize_ratings():
@@ -245,28 +267,22 @@ with col1:
 
 with col2:
 
-    st.markdown(
-        """
-        <div class='main-title'>
-            Tech Mahindra Smart Canteen
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+<div class="main-title">
+Tech Mahindra Smart Canteen
+</div>
+""", unsafe_allow_html=True)
 
-    st.markdown(
-        f"""
-        <div class='sub-title'>
-            Currently Serving: <b>{selected_meal}</b>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown(f"""
+<div class="sub-title">
+Currently Serving: <b>{selected_meal}</b>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("---")
 
 # =====================================================
-# TOP 5 HIGHEST RATED
+# TOP 5
 # =====================================================
 
 st.markdown("## Top 5 Highest Rated Dishes")
@@ -296,35 +312,29 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-cols = st.columns(len(top_dishes))
+html = '<div class="scroll-row">'
 
-for col, dish in zip(cols, top_dishes):
+for dish in top_dishes:
 
     stars = "⭐" * int(round(dish["rating"]))
 
-    with col:
+    html += f'''
+<div class="card">
+<h3>{dish["food"]}</h3>
+<p><b>{dish["vendor"]}</b></p>
+<h2>{stars}</h2>
+<p>{dish["rating"]}/5</p>
+</div>
+'''
 
-        st.markdown(
-            f"""
-            <div class="card">
+html += '</div>'
 
-                <h3>{dish['food']}</h3>
-
-                <p><b>{dish['vendor']}</b></p>
-
-                <h2>{stars}</h2>
-
-                <p>{dish['rating']}/5</p>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+st.markdown(html, unsafe_allow_html=True)
 
 st.markdown("---")
 
 # =====================================================
-# FEEDBACK SECTION
+# FEEDBACK
 # =====================================================
 
 st.markdown("## Food Feedback")
@@ -342,18 +352,18 @@ for tab, vendor in zip(tabs, vendors):
         selected_food = st.selectbox(
             f"Select Food - {vendor}",
             foods,
-            key=f"feedback_food_{vendor}"
+            key=f"feedback_{vendor}"
         )
 
         feedback_text = st.text_area(
             "Write Your Feedback",
-            placeholder="Taste, quality, hygiene, freshness etc.",
+            placeholder="Taste, hygiene, quality etc.",
             key=f"text_{vendor}"
         )
 
         if st.button(
             f"Submit Feedback - {vendor}",
-            key=f"feedback_btn_{vendor}"
+            key=f"btn_feedback_{vendor}"
         ):
 
             feedback_data = []
@@ -414,32 +424,25 @@ for vendor, foods in meal_data.items():
         "votes": best_votes
     })
 
-cols = st.columns(len(best_sellers))
+html = '<div class="scroll-row">'
 
-for col, item in zip(cols, best_sellers):
+for item in best_sellers:
 
     stars = "⭐" * int(round(item["rating"]))
 
-    with col:
+    html += f'''
+<div class="card">
+<h3>{item["vendor"]}</h3>
+<p><b>{item["food"]}</b></p>
+<h2>{stars}</h2>
+<p>{item["rating"]}/5</p>
+<p>{item["votes"]} Votes</p>
+</div>
+'''
 
-        st.markdown(
-            f"""
-            <div class="card">
+html += '</div>'
 
-                <h3>{item['vendor']}</h3>
-
-                <p><b>{item['food']}</b></p>
-
-                <h2>{stars}</h2>
-
-                <p>{item['rating']}/5</p>
-
-                <p>{item['votes']} Votes</p>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+st.markdown(html, unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -472,22 +475,14 @@ for tab, vendor in zip(tabs, vendors):
 
         stars = "⭐" * int(round(avg))
 
-        st.markdown(
-            f"""
-            <div class="card">
-
-                <h3>{selected_food}</h3>
-
-                <h2>{stars}</h2>
-
-                <p><b>{avg}/5 Rating</b></p>
-
-                <p>{votes} Votes</p>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown(f'''
+<div class="card">
+<h3>{selected_food}</h3>
+<h2>{stars}</h2>
+<p><b>{avg}/5 Rating</b></p>
+<p>{votes} Votes</p>
+</div>
+''', unsafe_allow_html=True)
 
         user_rating = st.feedback(
             "stars",
