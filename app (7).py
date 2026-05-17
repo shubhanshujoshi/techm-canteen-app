@@ -3,9 +3,9 @@ from datetime import datetime
 import json
 import os
 
-# ---------------------------------------------------
+# =====================================================
 # PAGE CONFIG
-# ---------------------------------------------------
+# =====================================================
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
@@ -13,9 +13,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------------------------------------------------
+# =====================================================
 # CUSTOM CSS
-# ---------------------------------------------------
+# =====================================================
 
 st.markdown("""
 <style>
@@ -24,47 +24,48 @@ html, body, [class*="css"] {
     font-family: "Segoe UI", sans-serif;
 }
 
+/* APP */
+
 .stApp {
     background-color: #f5f5f5;
-}
-
-/* DARK MODE */
-
-@media (prefers-color-scheme: dark) {
-
-    .stApp {
-        background-color: #111111 !important;
-    }
-
-    p, h1, h2, h3, h4, h5, h6, label, div {
-        color: white !important;
-    }
 }
 
 /* TITLE */
 
 .main-title {
+    font-size: 34px;
+    font-weight: 700;
     background: linear-gradient(90deg, #E20031, #ff4d6d);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-size: 34px;
-    font-weight: 700;
 }
 
 .sub-title {
-    font-size: 16px;
     color: #666;
+    font-size: 16px;
 }
 
-/* BUTTONS */
+/* CARD */
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+    border-top: 5px solid #E20031;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* BUTTON */
 
 .stButton > button {
     background-color: #E20031;
     color: white;
     border-radius: 10px;
     border: none;
-    font-weight: 600;
     width: 100%;
+    font-weight: 600;
 }
 
 .stButton > button:hover {
@@ -72,11 +73,11 @@ html, body, [class*="css"] {
     color: white;
 }
 
-/* BIGGER STARS */
+/* STARS */
 
 [data-testid="stFeedback"] button {
-    transform: scale(1.8);
-    margin-right: 12px;
+    transform: scale(1.7);
+    margin-right: 10px;
 }
 
 /* MOBILE */
@@ -92,16 +93,16 @@ html, body, [class*="css"] {
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------
+# =====================================================
 # DATA FILES
-# ---------------------------------------------------
+# =====================================================
 
 DATA_FILE = "ratings_data.json"
 FEEDBACK_FILE = "food_feedback.json"
 
-# ---------------------------------------------------
+# =====================================================
 # FOOD DATA
-# ---------------------------------------------------
+# =====================================================
 
 default_data = {
 
@@ -138,9 +139,9 @@ default_data = {
     }
 }
 
-# ---------------------------------------------------
+# =====================================================
 # INITIALIZE RATINGS
-# ---------------------------------------------------
+# =====================================================
 
 def initialize_ratings():
 
@@ -161,9 +162,9 @@ def initialize_ratings():
 
     return ratings
 
-# ---------------------------------------------------
+# =====================================================
 # LOAD DATA
-# ---------------------------------------------------
+# =====================================================
 
 def load_data():
 
@@ -186,9 +187,9 @@ def load_data():
 
     return fresh_data
 
-# ---------------------------------------------------
+# =====================================================
 # SAVE DATA
-# ---------------------------------------------------
+# =====================================================
 
 def save_data(data):
 
@@ -197,9 +198,9 @@ def save_data(data):
 
 ratings_data = load_data()
 
-# ---------------------------------------------------
+# =====================================================
 # CURRENT MEAL
-# ---------------------------------------------------
+# =====================================================
 
 current_hour = datetime.now().hour
 
@@ -219,9 +220,9 @@ def get_current_meal():
 
 auto_meal = get_current_meal()
 
-# ---------------------------------------------------
+# =====================================================
 # SIDEBAR
-# ---------------------------------------------------
+# =====================================================
 
 st.sidebar.title("Meal Filters")
 
@@ -233,11 +234,11 @@ selected_meal = st.sidebar.selectbox(
 
 meal_data = default_data[selected_meal]
 
-# ---------------------------------------------------
+# =====================================================
 # HEADER
-# ---------------------------------------------------
+# =====================================================
 
-col1, col2 = st.columns([1, 7])
+col1, col2 = st.columns([1, 8])
 
 with col1:
     st.markdown("## 🍽️")
@@ -246,7 +247,7 @@ with col2:
 
     st.markdown(
         """
-        <div class="main-title">
+        <div class='main-title'>
             Tech Mahindra Smart Canteen
         </div>
         """,
@@ -255,7 +256,7 @@ with col2:
 
     st.markdown(
         f"""
-        <div class="sub-title">
+        <div class='sub-title'>
             Currently Serving: <b>{selected_meal}</b>
         </div>
         """,
@@ -264,9 +265,9 @@ with col2:
 
 st.markdown("---")
 
-# ---------------------------------------------------
-# TOP 5 DISHES
-# ---------------------------------------------------
+# =====================================================
+# TOP 5 HIGHEST RATED
+# =====================================================
 
 st.markdown("## Top 5 Highest Rated Dishes")
 
@@ -278,10 +279,10 @@ for vendor, foods in meal_data.items():
 
         key = f"{selected_meal}|{vendor}|{food}"
 
-        total_rating = ratings_data[key]["total_rating"]
         votes = ratings_data[key]["votes"]
+        total = ratings_data[key]["total_rating"]
 
-        avg = round(total_rating / votes, 1) if votes > 0 else 0
+        avg = round(total / votes, 1) if votes > 0 else 0
 
         top_dishes.append({
             "food": food,
@@ -295,51 +296,36 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-top_html = """
-<div style="
-display:flex;
-overflow-x:auto;
-gap:16px;
-padding-bottom:12px;
-">
-"""
+cols = st.columns(len(top_dishes))
 
-for idx, dish in enumerate(top_dishes):
+for col, dish in zip(cols, top_dishes):
 
     stars = "⭐" * int(round(dish["rating"]))
 
-    top_html += f"""
-    <div style="
-        min-width:250px;
-        background:white;
-        border-radius:18px;
-        padding:20px;
-        border-top:5px solid #E20031;
-        box-shadow:0 4px 12px rgba(0,0,0,0.08);
-        text-align:center;
-        flex-shrink:0;
-    ">
+    with col:
 
-        <h3>{idx+1}. {dish['food']}</h3>
+        st.markdown(
+            f"""
+            <div class="card">
 
-        <p><b>{dish['vendor']}</b></p>
+                <h3>{dish['food']}</h3>
 
-        <h2>{stars}</h2>
+                <p><b>{dish['vendor']}</b></p>
 
-        <p>{dish['rating']}/5</p>
+                <h2>{stars}</h2>
 
-    </div>
-    """
+                <p>{dish['rating']}/5</p>
 
-top_html += "</div>"
-
-st.markdown(top_html, unsafe_allow_html=True)
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 st.markdown("---")
 
-# ---------------------------------------------------
+# =====================================================
 # FEEDBACK SECTION
-# ---------------------------------------------------
+# =====================================================
 
 st.markdown("## Food Feedback")
 
@@ -361,7 +347,7 @@ for tab, vendor in zip(tabs, vendors):
 
         feedback_text = st.text_area(
             "Write Your Feedback",
-            placeholder="Taste, quality, hygiene, service etc.",
+            placeholder="Taste, quality, hygiene, freshness etc.",
             key=f"text_{vendor}"
         )
 
@@ -392,9 +378,9 @@ for tab, vendor in zip(tabs, vendors):
 
 st.markdown("---")
 
-# ---------------------------------------------------
+# =====================================================
 # BEST SELLERS
-# ---------------------------------------------------
+# =====================================================
 
 st.markdown("## Best Selling Food Item Of Each Vendor")
 
@@ -411,9 +397,9 @@ for vendor, foods in meal_data.items():
         key = f"{selected_meal}|{vendor}|{food}"
 
         votes = ratings_data[key]["votes"]
-        total_rating = ratings_data[key]["total_rating"]
+        total = ratings_data[key]["total_rating"]
 
-        avg = round(total_rating / votes, 1) if votes > 0 else 0
+        avg = round(total / votes, 1) if votes > 0 else 0
 
         if votes > best_votes:
 
@@ -428,53 +414,38 @@ for vendor, foods in meal_data.items():
         "votes": best_votes
     })
 
-seller_html = """
-<div style="
-display:flex;
-overflow-x:auto;
-gap:16px;
-padding-bottom:12px;
-">
-"""
+cols = st.columns(len(best_sellers))
 
-for item in best_sellers:
+for col, item in zip(cols, best_sellers):
 
     stars = "⭐" * int(round(item["rating"]))
 
-    seller_html += f"""
-    <div style="
-        min-width:250px;
-        background:white;
-        border-radius:18px;
-        padding:20px;
-        border-top:5px solid #E20031;
-        box-shadow:0 4px 12px rgba(0,0,0,0.08);
-        text-align:center;
-        flex-shrink:0;
-    ">
+    with col:
 
-        <h3>{item['vendor']}</h3>
+        st.markdown(
+            f"""
+            <div class="card">
 
-        <p><b>{item['food']}</b></p>
+                <h3>{item['vendor']}</h3>
 
-        <h2>{stars}</h2>
+                <p><b>{item['food']}</b></p>
 
-        <p>{item['rating']}/5</p>
+                <h2>{stars}</h2>
 
-        <p>{item['votes']} Votes</p>
+                <p>{item['rating']}/5</p>
 
-    </div>
-    """
+                <p>{item['votes']} Votes</p>
 
-seller_html += "</div>"
-
-st.markdown(seller_html, unsafe_allow_html=True)
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 st.markdown("---")
 
-# ---------------------------------------------------
+# =====================================================
 # RATE FOOD
-# ---------------------------------------------------
+# =====================================================
 
 st.markdown("## Rate Food")
 
@@ -494,25 +465,16 @@ for tab, vendor in zip(tabs, vendors):
 
         key = f"{selected_meal}|{vendor}|{selected_food}"
 
-        total_rating = ratings_data[key]["total_rating"]
         votes = ratings_data[key]["votes"]
+        total = ratings_data[key]["total_rating"]
 
-        avg = round(total_rating / votes, 1) if votes > 0 else 0
+        avg = round(total / votes, 1) if votes > 0 else 0
 
         stars = "⭐" * int(round(avg))
 
         st.markdown(
             f"""
-            <div style="
-                background:white;
-                padding:20px;
-                border-radius:18px;
-                border-top:5px solid #E20031;
-                box-shadow:0 4px 12px rgba(0,0,0,0.08);
-                text-align:center;
-                margin-top:15px;
-                margin-bottom:20px;
-            ">
+            <div class="card">
 
                 <h3>{selected_food}</h3>
 
@@ -540,7 +502,6 @@ for tab, vendor in zip(tabs, vendors):
             if user_rating is not None:
 
                 ratings_data[key]["total_rating"] += user_rating + 1
-
                 ratings_data[key]["votes"] += 1
 
                 save_data(ratings_data)
@@ -553,11 +514,13 @@ for tab, vendor in zip(tabs, vendors):
 
             else:
 
-                st.warning("Please select stars first.")
+                st.warning(
+                    "Please select stars first."
+                )
 
-# ---------------------------------------------------
+# =====================================================
 # FOOTER
-# ---------------------------------------------------
+# =====================================================
 
 st.markdown("---")
 
