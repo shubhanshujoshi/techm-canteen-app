@@ -62,6 +62,17 @@ LIGHT MODE
     color: #111111;
 }
 
+/* FEEDBACK CARD */
+
+.feedback-card {
+    background: white;
+    border-left: 5px solid #E20031;
+    border-radius: 14px;
+    padding: 15px;
+    margin-bottom: 14px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.06);
+}
+
 /* SCROLL */
 
 .scroll-row {
@@ -130,6 +141,11 @@ DARK MODE
         box-shadow: 0px 4px 12px rgba(255,255,255,0.05);
     }
 
+    .feedback-card {
+        background: #1e1e1e !important;
+        color: white !important;
+    }
+
     .stSelectbox div[data-baseweb="select"] {
         background-color: #1e1e1e !important;
         color: white !important;
@@ -140,18 +156,9 @@ DARK MODE
         color: white !important;
     }
 
-    .stTabs [data-baseweb="tab"] {
-        color: white !important;
-    }
-
     section[data-testid="stSidebar"] {
         background-color: #1a1a1a !important;
     }
-
-    .stMarkdown {
-        color: white !important;
-    }
-
 }
 
 /* =====================================================
@@ -220,7 +227,7 @@ default_data = {
 }
 
 # =====================================================
-# INITIALIZE
+# INITIALIZE RATINGS
 # =====================================================
 
 def initialize_ratings():
@@ -312,6 +319,18 @@ selected_meal = st.sidebar.selectbox(
     index=["Breakfast", "Lunch", "Snacks", "Dinner"].index(auto_meal)
 )
 
+# RESET BUTTON
+
+if st.sidebar.button("🔄 Reset All Ratings"):
+
+    ratings_data = initialize_ratings()
+
+    save_data(ratings_data)
+
+    st.sidebar.success("All ratings have been reset successfully")
+
+    st.rerun()
+
 meal_data = default_data[selected_meal]
 
 # =====================================================
@@ -321,7 +340,7 @@ meal_data = default_data[selected_meal]
 col1, col2 = st.columns([1, 8])
 
 with col1:
-    st.markdown("## 🍽️")
+    st.image("logo.png", width=70)
 
 with col2:
 
@@ -392,7 +411,7 @@ st.markdown(html, unsafe_allow_html=True)
 st.markdown("---")
 
 # =====================================================
-# FEEDBACK
+# FEEDBACK SECTION
 # =====================================================
 
 st.markdown("## Food Feedback")
@@ -419,30 +438,79 @@ for tab, vendor in zip(tabs, vendors):
             key=f"text_{vendor}"
         )
 
-        if st.button(
-            f"Submit Feedback - {vendor}",
-            key=f"btn_feedback_{vendor}"
-        ):
+        col1, col2 = st.columns(2)
 
-            feedback_data = []
+        with col1:
+
+            if st.button(
+                f"Submit Feedback - {vendor}",
+                key=f"btn_feedback_{vendor}"
+            ):
+
+                feedback_data = []
+
+                if os.path.exists(FEEDBACK_FILE):
+
+                    with open(FEEDBACK_FILE, "r") as f:
+                        feedback_data = json.load(f)
+
+                feedback_data.append({
+                    "meal": selected_meal,
+                    "vendor": vendor,
+                    "food": selected_food,
+                    "feedback": feedback_text,
+                    "time": str(datetime.now())
+                })
+
+                with open(FEEDBACK_FILE, "w") as f:
+                    json.dump(feedback_data, f)
+
+                st.success("Feedback Submitted Successfully")
+
+        with col2:
+
+            show_feedback = st.button(
+                f"📋 Recent Feedbacks - {vendor}",
+                key=f"recent_feedback_{vendor}"
+            )
+
+        if show_feedback:
 
             if os.path.exists(FEEDBACK_FILE):
 
                 with open(FEEDBACK_FILE, "r") as f:
                     feedback_data = json.load(f)
 
-            feedback_data.append({
-                "meal": selected_meal,
-                "vendor": vendor,
-                "food": selected_food,
-                "feedback": feedback_text,
-                "time": str(datetime.now())
-            })
+                vendor_feedbacks = [
+                    x for x in reversed(feedback_data)
+                    if x["vendor"] == vendor
+                ]
 
-            with open(FEEDBACK_FILE, "w") as f:
-                json.dump(feedback_data, f)
+                if vendor_feedbacks:
 
-            st.success("Feedback Submitted Successfully")
+                    st.markdown("### Recent Customer Feedbacks")
+
+                    for item in vendor_feedbacks[:5]:
+
+                        st.markdown(f"""
+<div class="feedback-card">
+
+<h4>{item["food"]}</h4>
+
+<p><b>Vendor:</b> {item["vendor"]}</p>
+
+<p>{item["feedback"]}</p>
+
+<p style="font-size:12px; opacity:0.7;">
+{item["time"][:19]}
+</p>
+
+</div>
+""", unsafe_allow_html=True)
+
+                else:
+
+                    st.info("No feedback available yet.")
 
 st.markdown("---")
 
