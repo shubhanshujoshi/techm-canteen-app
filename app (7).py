@@ -24,8 +24,13 @@ html, body, [class*="css"] {
     font-family: "Segoe UI", sans-serif;
 }
 
+/* =====================================================
+LIGHT MODE
+===================================================== */
+
 .stApp {
     background-color: #f5f5f5;
+    color: #111111;
 }
 
 /* TITLE */
@@ -39,7 +44,7 @@ html, body, [class*="css"] {
 }
 
 .sub-title {
-    color: #666666;
+    color: #555555;
     font-size: 16px;
 }
 
@@ -54,9 +59,10 @@ html, body, [class*="css"] {
     text-align: center;
     min-width: 240px;
     flex-shrink: 0;
+    color: #111111;
 }
 
-/* SCROLL ROW */
+/* SCROLL */
 
 .scroll-row {
     display: flex;
@@ -75,7 +81,7 @@ html, body, [class*="css"] {
     border-radius: 10px;
 }
 
-/* BUTTONS */
+/* BUTTON */
 
 .stButton > button {
     background-color: #E20031;
@@ -91,14 +97,66 @@ html, body, [class*="css"] {
     color: white;
 }
 
-/* BIGGER STARS */
+/* BIG STARS */
 
 [data-testid="stFeedback"] button {
     transform: scale(1.7);
     margin-right: 10px;
 }
 
-/* MOBILE */
+/* =====================================================
+DARK MODE
+===================================================== */
+
+@media (prefers-color-scheme: dark) {
+
+    .stApp {
+        background-color: #111111 !important;
+        color: white !important;
+    }
+
+    html, body, p, h1, h2, h3, h4, h5, h6,
+    label, span, div {
+        color: white !important;
+    }
+
+    .sub-title {
+        color: #cccccc !important;
+    }
+
+    .card {
+        background: #1e1e1e !important;
+        color: white !important;
+        box-shadow: 0px 4px 12px rgba(255,255,255,0.05);
+    }
+
+    .stSelectbox div[data-baseweb="select"] {
+        background-color: #1e1e1e !important;
+        color: white !important;
+    }
+
+    .stTextArea textarea {
+        background-color: #1e1e1e !important;
+        color: white !important;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        color: white !important;
+    }
+
+    section[data-testid="stSidebar"] {
+        background-color: #1a1a1a !important;
+    }
+
+    .stMarkdown {
+        color: white !important;
+    }
+
+}
+
+/* =====================================================
+MOBILE
+===================================================== */
 
 @media (max-width: 768px) {
 
