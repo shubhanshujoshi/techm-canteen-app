@@ -487,26 +487,28 @@ for tab, vendor in zip(tabs, vendors):
 
                     save_data(ratings_data)
 
-                # SAVE FEEDBACK
+                # SAVE ONLY IF TEXT FEEDBACK EXISTS
 
-                feedback_data = []
+                if feedback_text.strip() != "":
 
-                if os.path.exists(FEEDBACK_FILE):
+                    feedback_data = []
 
-                    with open(FEEDBACK_FILE, "r") as f:
-                        feedback_data = json.load(f)
+                    if os.path.exists(FEEDBACK_FILE):
 
-                feedback_data.append({
-                    "meal": selected_meal,
-                    "vendor": vendor,
-                    "food": selected_food,
-                    "feedback": feedback_text,
-                    "rating": user_rating + 1 if user_rating is not None else "Not Rated",
-                    "time": str(datetime.now())
-                })
+                        with open(FEEDBACK_FILE, "r") as f:
+                            feedback_data = json.load(f)
 
-                with open(FEEDBACK_FILE, "w") as f:
-                    json.dump(feedback_data, f)
+                    feedback_data.append({
+                        "meal": selected_meal,
+                        "vendor": vendor,
+                        "food": selected_food,
+                        "feedback": feedback_text,
+                        "rating": user_rating + 1 if user_rating is not None else "Not Rated",
+                        "time": str(datetime.now())
+                    })
+
+                    with open(FEEDBACK_FILE, "w") as f:
+                        json.dump(feedback_data, f)
 
                 st.success("Feedback Submitted Successfully")
 
@@ -530,9 +532,12 @@ for tab, vendor in zip(tabs, vendors):
                 with open(FEEDBACK_FILE, "r") as f:
                     feedback_data = json.load(f)
 
+                # ONLY FEEDBACKS WITH ACTUAL TEXT
+
                 vendor_feedbacks = [
                     x for x in reversed(feedback_data)
                     if x["vendor"] == vendor
+                    and x["feedback"].strip() != ""
                 ]
 
                 if vendor_feedbacks:
@@ -568,7 +573,7 @@ for tab, vendor in zip(tabs, vendors):
 
                 else:
 
-                    st.info("No feedback available yet.")
+                    st.info("No verbal feedback available yet.")
 
 st.markdown("---")
 
