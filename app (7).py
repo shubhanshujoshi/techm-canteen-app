@@ -56,6 +56,7 @@ html, body, [class*="css"] {
     box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
     text-align: center;
     min-width: 240px;
+    max-width: 240px;
     flex-shrink: 0;
     color: #111111;
 }
@@ -64,20 +65,22 @@ html, body, [class*="css"] {
 
 .feedback-card {
     background: white;
+    border-radius: 18px;
+    padding: 18px;
     border-left: 5px solid #E20031;
-    border-radius: 14px;
-    padding: 15px;
-    margin-bottom: 14px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.06);
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+    min-width: 300px;
+    max-width: 300px;
+    flex-shrink: 0;
 }
 
-/* SCROLL */
+/* SCROLL ROW */
 
 .scroll-row {
     display: flex;
     overflow-x: auto;
     gap: 16px;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     scroll-behavior: smooth;
 }
 
@@ -134,7 +137,6 @@ html, body, [class*="css"] {
     .card {
         background: #1e1e1e !important;
         color: white !important;
-        box-shadow: 0px 4px 12px rgba(255,255,255,0.05);
     }
 
     .feedback-card {
@@ -167,6 +169,12 @@ html, body, [class*="css"] {
 
     .card {
         min-width: 85%;
+        max-width: 85%;
+    }
+
+    .feedback-card {
+        min-width: 90%;
+        max-width: 90%;
     }
 
 }
@@ -321,7 +329,7 @@ if st.sidebar.button("🔄 Reset All Ratings"):
 
     save_data(ratings_data)
 
-    st.sidebar.success("All ratings have been reset successfully")
+    st.sidebar.success("All ratings reset successfully")
 
     st.rerun()
 
@@ -405,7 +413,7 @@ st.markdown(html, unsafe_allow_html=True)
 st.markdown("---")
 
 # =====================================================
-# FOOD FEEDBACK + RATING
+# FOOD FEEDBACK & RATING
 # =====================================================
 
 st.markdown("## Food Feedback & Rating")
@@ -459,6 +467,10 @@ for tab, vendor in zip(tabs, vendors):
 
         col1, col2 = st.columns(2)
 
+        # =====================================================
+        # SUBMIT
+        # =====================================================
+
         with col1:
 
             if st.button(
@@ -500,6 +512,10 @@ for tab, vendor in zip(tabs, vendors):
 
                 st.rerun()
 
+        # =====================================================
+        # RECENT FEEDBACKS
+        # =====================================================
+
         with col2:
 
             show_feedback = st.button(
@@ -521,27 +537,34 @@ for tab, vendor in zip(tabs, vendors):
 
                 if vendor_feedbacks:
 
-                    st.markdown("### Recent Customer Feedbacks")
+                    feedback_html = '<div class="scroll-row">'
 
-                    for item in vendor_feedbacks[:5]:
+                    for item in vendor_feedbacks[:10]:
 
-                        st.markdown(f"""
+                        feedback_html += f'''
 <div class="feedback-card">
 
 <h4>{item["food"]}</h4>
 
-<p><b>Vendor:</b> {item["vendor"]}</p>
+<p><b>⭐ Rating:</b> {item["rating"]}</p>
 
-<p><b>Rating:</b> ⭐ {item["rating"]}</p>
+<p style="margin-top:10px;">
+{item["feedback"]}
+</p>
 
-<p>{item["feedback"]}</p>
-
-<p style="font-size:12px; opacity:0.7;">
+<p style="font-size:12px; opacity:0.7; margin-top:10px;">
 {item["time"][:19]}
 </p>
 
 </div>
-""", unsafe_allow_html=True)
+'''
+
+                    feedback_html += '</div>'
+
+                    st.markdown(
+                        feedback_html,
+                        unsafe_allow_html=True
+                    )
 
                 else:
 
