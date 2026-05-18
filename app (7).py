@@ -323,7 +323,7 @@ selected_meal = st.sidebar.selectbox(
 
 # RESET BUTTON
 
-if st.sidebar.button("🔄 Reset All Ratings"):
+if st.sidebar.button(" Reset All Ratings"):
 
     ratings_data = initialize_ratings()
 
@@ -521,7 +521,7 @@ for tab, vendor in zip(tabs, vendors):
         with col2:
 
             show_feedback = st.button(
-                f"📋 Recent Feedbacks - {vendor}",
+                f" Recent Feedbacks - {vendor}",
                 key=f"recent_feedback_{vendor}"
             )
 
