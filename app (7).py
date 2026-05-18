@@ -24,9 +24,7 @@ html, body, [class*="css"] {
     font-family: "Segoe UI", sans-serif;
 }
 
-/* =====================================================
-LIGHT MODE
-===================================================== */
+/* LIGHT MODE */
 
 .stApp {
     background-color: #f5f5f5;
@@ -108,16 +106,14 @@ LIGHT MODE
     color: white;
 }
 
-/* BIG STARS */
+/* BIGGER STARS */
 
 [data-testid="stFeedback"] button {
     transform: scale(1.7);
     margin-right: 10px;
 }
 
-/* =====================================================
-DARK MODE
-===================================================== */
+/* DARK MODE */
 
 @media (prefers-color-scheme: dark) {
 
@@ -161,9 +157,7 @@ DARK MODE
     }
 }
 
-/* =====================================================
-MOBILE
-===================================================== */
+/* MOBILE */
 
 @media (max-width: 768px) {
 
@@ -321,7 +315,7 @@ selected_meal = st.sidebar.selectbox(
 
 # RESET BUTTON
 
-if st.sidebar.button("Reset All Ratings"):
+if st.sidebar.button("🔄 Reset All Ratings"):
 
     ratings_data = initialize_ratings()
 
@@ -411,10 +405,10 @@ st.markdown(html, unsafe_allow_html=True)
 st.markdown("---")
 
 # =====================================================
-# FEEDBACK SECTION
+# FOOD FEEDBACK + RATING
 # =====================================================
 
-st.markdown("## Food Feedback")
+st.markdown("## Food Feedback & Rating")
 
 vendors = list(meal_data.keys())
 
@@ -432,6 +426,31 @@ for tab, vendor in zip(tabs, vendors):
             key=f"feedback_{vendor}"
         )
 
+        key = f"{selected_meal}|{vendor}|{selected_food}"
+
+        votes = ratings_data[key]["votes"]
+        total = ratings_data[key]["total_rating"]
+
+        avg = round(total / votes, 1) if votes > 0 else 0
+
+        stars = "⭐" * int(round(avg))
+
+        st.markdown(f'''
+<div class="card">
+<h3>{selected_food}</h3>
+<h2>{stars}</h2>
+<p><b>{avg}/5 Rating</b></p>
+<p>{votes} Votes</p>
+</div>
+''', unsafe_allow_html=True)
+
+        st.markdown("### Rate This Food")
+
+        user_rating = st.feedback(
+            "stars",
+            key=f"rating_{key}"
+        )
+
         feedback_text = st.text_area(
             "Write Your Feedback",
             placeholder="Taste, hygiene, quality etc.",
@@ -443,9 +462,20 @@ for tab, vendor in zip(tabs, vendors):
         with col1:
 
             if st.button(
-                f"Submit Feedback - {vendor}",
+                f"Submit Rating & Feedback - {vendor}",
                 key=f"btn_feedback_{vendor}"
             ):
+
+                # SAVE RATING
+
+                if user_rating is not None:
+
+                    ratings_data[key]["total_rating"] += user_rating + 1
+                    ratings_data[key]["votes"] += 1
+
+                    save_data(ratings_data)
+
+                # SAVE FEEDBACK
 
                 feedback_data = []
 
@@ -459,6 +489,7 @@ for tab, vendor in zip(tabs, vendors):
                     "vendor": vendor,
                     "food": selected_food,
                     "feedback": feedback_text,
+                    "rating": user_rating + 1 if user_rating is not None else "Not Rated",
                     "time": str(datetime.now())
                 })
 
@@ -467,10 +498,12 @@ for tab, vendor in zip(tabs, vendors):
 
                 st.success("Feedback Submitted Successfully")
 
+                st.rerun()
+
         with col2:
 
             show_feedback = st.button(
-                f" Recent Feedbacks - {vendor}",
+                f"📋 Recent Feedbacks - {vendor}",
                 key=f"recent_feedback_{vendor}"
             )
 
@@ -498,6 +531,8 @@ for tab, vendor in zip(tabs, vendors):
 <h4>{item["food"]}</h4>
 
 <p><b>Vendor:</b> {item["vendor"]}</p>
+
+<p><b>Rating:</b> ⭐ {item["rating"]}</p>
 
 <p>{item["feedback"]}</p>
 
@@ -569,75 +604,6 @@ for item in best_sellers:
 html += '</div>'
 
 st.markdown(html, unsafe_allow_html=True)
-
-st.markdown("---")
-
-# =====================================================
-# RATE FOOD
-# =====================================================
-
-st.markdown("## Rate Food")
-
-tabs = st.tabs(vendors)
-
-for tab, vendor in zip(tabs, vendors):
-
-    with tab:
-
-        foods = meal_data[vendor]
-
-        selected_food = st.selectbox(
-            f"Choose Food - {vendor}",
-            foods,
-            key=f"rate_{vendor}"
-        )
-
-        key = f"{selected_meal}|{vendor}|{selected_food}"
-
-        votes = ratings_data[key]["votes"]
-        total = ratings_data[key]["total_rating"]
-
-        avg = round(total / votes, 1) if votes > 0 else 0
-
-        stars = "⭐" * int(round(avg))
-
-        st.markdown(f'''
-<div class="card">
-<h3>{selected_food}</h3>
-<h2>{stars}</h2>
-<p><b>{avg}/5 Rating</b></p>
-<p>{votes} Votes</p>
-</div>
-''', unsafe_allow_html=True)
-
-        user_rating = st.feedback(
-            "stars",
-            key=f"rating_{key}"
-        )
-
-        if st.button(
-            f"Submit Rating - {selected_food}",
-            key=f"btn_{key}"
-        ):
-
-            if user_rating is not None:
-
-                ratings_data[key]["total_rating"] += user_rating + 1
-                ratings_data[key]["votes"] += 1
-
-                save_data(ratings_data)
-
-                st.success(
-                    f"Successfully Rated {selected_food}"
-                )
-
-                st.rerun()
-
-            else:
-
-                st.warning(
-                    "Please select stars first."
-                )
 
 # =====================================================
 # FOOTER
