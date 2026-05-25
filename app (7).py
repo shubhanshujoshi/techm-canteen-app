@@ -1,6 +1,6 @@
 # =====================================================
 # TECH MAHINDRA SMART CANTEEN SYSTEM
-# FINAL RESPONSIVE SWIPE VERSION
+# FINAL RESPONSIVE VERSION
 # =====================================================
 
 import streamlit as st
@@ -63,6 +63,68 @@ html, body, [class*="css"] {
     width: 100%;
 }
 
+/* CARDS */
+
+.card {
+
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 22px;
+
+    border-left: 6px solid #D9232D;
+
+    box-shadow:
+    0px 4px 14px rgba(0,0,0,0.08);
+
+    min-height: 250px;
+}
+
+/* SWIPE SECTION */
+
+.swipe-wrapper {
+
+    display: flex;
+
+    overflow-x: auto;
+
+    gap: 18px;
+
+    padding-bottom: 10px;
+
+    scroll-snap-type: x mandatory;
+}
+
+.swipe-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.swipe-wrapper::-webkit-scrollbar-thumb {
+    background: #D9232D;
+    border-radius: 10px;
+}
+
+.swipe-card {
+
+    flex: 0 0 320px;
+
+    scroll-snap-align: start;
+}
+
+/* MOBILE */
+
+@media screen and (max-width: 768px) {
+
+    .main-title {
+        font-size: 28px;
+    }
+
+    .swipe-card {
+        flex: 0 0 90%;
+    }
+}
+
 /* TABS */
 
 .stTabs [data-baseweb="tab"] {
@@ -82,7 +144,7 @@ html, body, [class*="css"] {
     transform: scale(1.4);
 }
 
-/* HIDE STREAMLIT */
+/* HIDE FOOTER */
 
 footer {
     visibility: hidden;
@@ -112,36 +174,11 @@ DATA_FILE = "ratings_data.json"
 default_data = {
 
     "Lunch": {
-
-        "Vendor A": [
-            "Dal Rice",
-            "Paneer Butter Masala",
-            "Roti"
-        ],
-
-        "Vendor B": [
-            "Biryani",
-            "Chicken Curry",
-            "Naan"
-        ],
-
-        "Vendor C": [
-            "Rajma Chawal",
-            "Mix Veg",
-            "Jeera Rice"
-        ],
-
-        "Vendor D": [
-            "Fried Rice",
-            "Noodles",
-            "Soup"
-        ],
-
-        "Vendor E": [
-            "Butter Chicken",
-            "Dal Makhani",
-            "Paneer Tikka"
-        ]
+        "Vendor A": ["Dal Rice", "Paneer Butter Masala", "Roti"],
+        "Vendor B": ["Biryani", "Chicken Curry", "Naan"],
+        "Vendor C": ["Rajma Chawal", "Mix Veg", "Jeera Rice"],
+        "Vendor D": ["Fried Rice", "Noodles", "Soup"],
+        "Vendor E": ["Butter Chicken", "Dal Makhani", "Paneer Tikka"]
     }
 }
 
@@ -208,54 +245,6 @@ def save_data(data):
 ratings_data = load_data()
 
 # =====================================================
-# SENTIMENT ANALYSIS
-# =====================================================
-
-def analyze_sentiment(feedbacks):
-
-    if not feedbacks:
-        return "🟡 Neutral"
-
-    positive_words = [
-        "good", "great", "excellent",
-        "amazing", "awesome", "tasty",
-        "love", "nice", "best",
-        "fresh", "fantastic"
-    ]
-
-    negative_words = [
-        "bad", "worst", "cold",
-        "stale", "awful", "poor",
-        "dirty", "disgusting"
-    ]
-
-    positive = 0
-    negative = 0
-
-    for feedback in feedbacks:
-
-        feedback = feedback.lower()
-
-        for word in positive_words:
-
-            if word in feedback:
-                positive += 1
-
-        for word in negative_words:
-
-            if word in feedback:
-                negative += 1
-
-    if positive > negative:
-        return "🟢 Positive"
-
-    elif negative > positive:
-        return "🔴 Negative"
-
-    else:
-        return "🟡 Neutral"
-
-# =====================================================
 # HEADER
 # =====================================================
 
@@ -289,7 +278,7 @@ st.markdown("---")
 meal_data = default_data["Lunch"]
 
 # =====================================================
-# TOP 5 HIGHEST RATED DISHES
+# TOP 5 DISHES
 # =====================================================
 
 st.markdown("## Top 5 Highest Rated Dishes")
@@ -321,18 +310,9 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-# =====================================================
-# SWIPE HTML
-# =====================================================
+html = """
 
-swipe_html = """
-<div style="
-display:flex;
-overflow-x:auto;
-gap:20px;
-padding:10px;
-scroll-snap-type:x mandatory;
-">
+<div class="swipe-wrapper">
 
 """
 
@@ -340,42 +320,31 @@ for idx, dish in enumerate(top_dishes):
 
     stars = "★" * int(round(dish["Rating"]))
 
-    swipe_html += f"""
+    html += f"""
 
-    <div style="
-    min-width:300px;
-    background:white;
-    border-radius:18px;
-    padding:24px;
-    border-left:6px solid #D9232D;
-    box-shadow:0px 4px 14px rgba(0,0,0,0.08);
-    scroll-snap-align:start;
-    ">
+    <div class="swipe-card">
 
-        <h2>{idx+1}. {dish['Food']}</h2>
+        <div class="card">
 
-        <p>
-        <b>{dish['Vendor']}</b>
-        </p>
+            <h2>{idx+1}. {dish['Food']}</h2>
 
-        <p style="
-        font-size:24px;
-        color:#D9232D;
-        ">
-        {stars}
-        </p>
+            <p><b>{dish['Vendor']}</b></p>
 
-        <h3>{dish['Rating']}/5</h3>
+            <p style="font-size:24px; color:#D9232D;">
+            {stars}
+            </p>
+
+            <h3>{dish['Rating']}/5</h3>
+
+        </div>
 
     </div>
+
     """
 
-swipe_html += "</div>"
+html += "</div>"
 
-st.markdown(
-    swipe_html,
-    unsafe_allow_html=True
-)
+st.markdown(html, unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -408,13 +377,7 @@ for tab, vendor in zip(tabs, meal_data.keys()):
 
         st.markdown(
             f"""
-            <div style="
-            background:white;
-            border-radius:18px;
-            padding:24px;
-            border-left:6px solid #D9232D;
-            box-shadow:0px 4px 14px rgba(0,0,0,0.08);
-            ">
+            <div class="card">
 
             <h2>{selected_food}</h2>
 
@@ -460,80 +423,10 @@ for tab, vendor in zip(tabs, meal_data.keys()):
 
                 save_data(ratings_data)
 
-                st.success(
-                    "Feedback Submitted Successfully ✅"
-                )
+                st.success("Feedback Submitted Successfully ✅")
 
                 st.rerun()
 
             else:
 
-                st.warning(
-                    "Please select star rating."
-                )
-
-st.markdown("---")
-
-# =====================================================
-# ADMIN DASHBOARD
-# =====================================================
-
-st.markdown("## Admin Dashboard")
-
-vendor_orders = {}
-sentiment_scores = {}
-
-for vendor, foods in meal_data.items():
-
-    total_orders = 0
-
-    all_feedbacks = []
-
-    for food in foods:
-
-        key = f"Lunch|{vendor}|{food}"
-
-        total_orders += ratings_data[key]["votes"]
-
-        all_feedbacks.extend(
-            ratings_data[key]["feedbacks"]
-        )
-
-    vendor_orders[vendor] = total_orders
-
-    sentiment_scores[vendor] = analyze_sentiment(
-        all_feedbacks
-    )
-
-cols = st.columns(5)
-
-for idx, vendor in enumerate(vendor_orders):
-
-    with cols[idx]:
-
-        st.markdown(
-            f"""
-            <div style="
-            background:white;
-            border-radius:18px;
-            padding:22px;
-            border-left:6px solid #D9232D;
-            box-shadow:0px 4px 14px rgba(0,0,0,0.08);
-            ">
-
-            <h3>{vendor}</h3>
-
-            <p>
-            <b>Total Orders:</b>
-            {vendor_orders[vendor]}
-            </p>
-
-            <p>
-            <b>Sentiment:</b>
-            {sentiment_scores[vendor]}
-            </p>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+                st.warning("Please select star rating.")
