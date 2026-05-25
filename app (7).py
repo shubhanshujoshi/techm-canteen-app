@@ -1,6 +1,7 @@
-# ---------------------------------------------------
-# IMPORTS
-# ---------------------------------------------------
+# =====================================================
+# TECH MAHINDRA SMART CANTEEN SYSTEM
+# FULLY RESPONSIVE + MOBILE SWIPE VERSION
+# =====================================================
 
 import streamlit as st
 from datetime import datetime
@@ -8,9 +9,9 @@ import json
 import os
 import pandas as pd
 
-# ---------------------------------------------------
+# =====================================================
 # PAGE CONFIG
-# ---------------------------------------------------
+# =====================================================
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
@@ -18,9 +19,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# ---------------------------------------------------
+# =====================================================
 # CUSTOM CSS
-# ---------------------------------------------------
+# =====================================================
 
 st.markdown("""
 <style>
@@ -30,6 +31,8 @@ st.markdown("""
 html, body, [class*="css"] {
     font-family: 'Aptos', sans-serif;
 }
+
+/* MAIN APP */
 
 .stApp {
     background-color: #f5f5f5;
@@ -66,11 +69,6 @@ section[data-testid="stSidebar"] {
     padding: 12px;
     font-weight: 600;
     width: 100%;
-    transition: 0.3s;
-}
-
-.stButton > button:hover {
-    background-color: #b71c26;
 }
 
 /* CARDS */
@@ -81,16 +79,16 @@ section[data-testid="stSidebar"] {
 .admin-card {
 
     background: white;
-    padding: 24px;
+    padding: 22px;
+
     border-radius: 18px;
-    margin-bottom: 18px;
 
     border-left: 6px solid #D9232D;
 
     box-shadow:
     0px 4px 14px rgba(0,0,0,0.08);
 
-    transition: 0.3s;
+    margin-bottom: 18px;
 }
 
 /* TABS */
@@ -106,14 +104,14 @@ section[data-testid="stSidebar"] {
     border-radius: 10px;
 }
 
-/* FEEDBACK */
+/* STARS */
 
 [data-testid="stFeedback"] button {
     transform: scale(1.5);
     margin-right: 10px;
 }
 
-/* FOOTER */
+/* HIDE FOOTER */
 
 footer {
     visibility: hidden;
@@ -127,50 +125,18 @@ header {
     visibility: hidden;
 }
 
-/* MOBILE SWIPE */
-
-.mobile-scroll {
-
-    display: flex;
-    overflow-x: auto;
-
-    gap: 16px;
-
-    padding-bottom: 10px;
-    padding-top: 5px;
-
-    scroll-behavior: smooth;
-}
-
-.mobile-scroll::-webkit-scrollbar {
-    height: 6px;
-}
-
-.mobile-scroll::-webkit-scrollbar-thumb {
-    background: #D9232D;
-    border-radius: 10px;
-}
-
-.mobile-card {
-
-    min-width: 280px;
-    max-width: 280px;
-
-    flex-shrink: 0;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------
+# =====================================================
 # DATA FILE
-# ---------------------------------------------------
+# =====================================================
 
 DATA_FILE = "ratings_data.json"
 
-# ---------------------------------------------------
+# =====================================================
 # FOOD DATA
-# ---------------------------------------------------
+# =====================================================
 
 default_data = {
 
@@ -207,9 +173,9 @@ default_data = {
     }
 }
 
-# ---------------------------------------------------
+# =====================================================
 # INITIALIZE RATINGS
-# ---------------------------------------------------
+# =====================================================
 
 def initialize_ratings():
 
@@ -231,9 +197,9 @@ def initialize_ratings():
 
     return ratings
 
-# ---------------------------------------------------
+# =====================================================
 # LOAD DATA
-# ---------------------------------------------------
+# =====================================================
 
 def load_data():
 
@@ -265,18 +231,18 @@ def load_data():
 
     return fresh_data
 
-# ---------------------------------------------------
+# =====================================================
 # SAVE DATA
-# ---------------------------------------------------
+# =====================================================
 
 def save_data(data):
 
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
-# ---------------------------------------------------
+# =====================================================
 # SENTIMENT ANALYSIS
-# ---------------------------------------------------
+# =====================================================
 
 def analyze_sentiment(feedbacks):
 
@@ -321,11 +287,15 @@ def analyze_sentiment(feedbacks):
     else:
         return "🟡 Neutral"
 
+# =====================================================
+# LOAD RATINGS
+# =====================================================
+
 ratings_data = load_data()
 
-# ---------------------------------------------------
+# =====================================================
 # CURRENT MEAL
-# ---------------------------------------------------
+# =====================================================
 
 current_hour = datetime.now().hour
 
@@ -345,9 +315,9 @@ def get_current_meal():
 
 auto_meal = get_current_meal()
 
-# ---------------------------------------------------
+# =====================================================
 # SIDEBAR
-# ---------------------------------------------------
+# =====================================================
 
 st.sidebar.title("Admin Controls")
 
@@ -371,9 +341,9 @@ selected_meal = st.sidebar.selectbox(
 
 meal_data = default_data[selected_meal]
 
-# ---------------------------------------------------
+# =====================================================
 # HEADER
-# ---------------------------------------------------
+# =====================================================
 
 col1, col2 = st.columns([1,7])
 
@@ -404,9 +374,9 @@ with col2:
 
 st.markdown("---")
 
-# ---------------------------------------------------
-# TOP 5 HIGHEST RATED
-# ---------------------------------------------------
+# =====================================================
+# TOP 5 DISHES
+# =====================================================
 
 st.markdown("## Top 5 Highest Rated Dishes")
 
@@ -437,17 +407,17 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-cards_html = '<div class="mobile-scroll">'
+top_cols = st.columns(len(top_dishes))
 
 for idx, dish in enumerate(top_dishes):
 
     stars = "★" * int(round(dish["Rating"]))
 
-    cards_html += f"""
+    with top_cols[idx]:
 
-    <div class="mobile-card">
-
-        <div class="top-card">
+        st.markdown(
+            f"""
+            <div class="top-card">
 
             <h3>{idx+1}. {dish['Food']}</h3>
 
@@ -461,62 +431,20 @@ for idx, dish in enumerate(top_dishes):
             <b>{dish['Rating']}/5</b>
             </p>
 
-        </div>
-
-    </div>
-    """
-
-cards_html += "</div>"
-
-st.markdown(cards_html, unsafe_allow_html=True)
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 st.markdown("---")
 
-# ---------------------------------------------------
+# =====================================================
 # RATE FOOD SECTION
-# ---------------------------------------------------
+# =====================================================
 
 st.markdown("## Rate Food Item")
 
 vendors = list(meal_data.keys())
-
-preview_html = '<div class="mobile-scroll">'
-
-for vendor in vendors:
-
-    food = meal_data[vendor][0]
-
-    key = f"{selected_meal}|{vendor}|{food}"
-
-    votes = ratings_data[key]["votes"]
-
-    avg = (
-        ratings_data[key]["total_rating"] / votes
-        if votes > 0 else 0
-    )
-
-    preview_html += f"""
-
-    <div class="mobile-card">
-
-        <div class="food-card">
-
-            <h3>{food}</h3>
-
-            <p><b>Vendor:</b> {vendor}</p>
-
-            <p><b>Rating:</b> {round(avg,1)}/5</p>
-
-            <p><b>Total Orders:</b> {votes}</p>
-
-        </div>
-
-    </div>
-    """
-
-preview_html += "</div>"
-
-st.markdown(preview_html, unsafe_allow_html=True)
 
 tabs = st.tabs(vendors)
 
@@ -602,13 +530,13 @@ for tab, vendor in zip(tabs, vendors):
 
 st.markdown("---")
 
-# ---------------------------------------------------
+# =====================================================
 # BEST SELLING DISHES
-# ---------------------------------------------------
+# =====================================================
 
 st.markdown("## Best Selling Dish Of Each Vendor")
 
-cols = st.columns(5)
+best_cols = st.columns(5)
 
 for idx, vendor in enumerate(meal_data.keys()):
 
@@ -633,7 +561,7 @@ for idx, vendor in enumerate(meal_data.keys()):
             best_food = food
             best_rating = round(avg,1)
 
-    with cols[idx]:
+    with best_cols[idx]:
 
         st.markdown(
             f"""
@@ -652,9 +580,9 @@ for idx, vendor in enumerate(meal_data.keys()):
             unsafe_allow_html=True
         )
 
-# ---------------------------------------------------
+# =====================================================
 # ADMIN DASHBOARD
-# ---------------------------------------------------
+# =====================================================
 
 if show_admin:
 
@@ -696,9 +624,7 @@ if show_admin:
 
         wastage_data[vendor] = wastage
 
-    st.markdown("### Vendor Performance")
-
-    admin_cols = st.columns(len(vendor_orders))
+    admin_cols = st.columns(5)
 
     for idx, vendor in enumerate(vendor_orders):
 
@@ -729,9 +655,9 @@ if show_admin:
 
     st.bar_chart(chart_data)
 
-# ---------------------------------------------------
+# =====================================================
 # FOOTER
-# ---------------------------------------------------
+# =====================================================
 
 st.markdown("---")
 
