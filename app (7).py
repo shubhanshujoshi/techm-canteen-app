@@ -10,7 +10,7 @@ import pandas as pd
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
-    page_icon="logo.png",
+    page_icon="🍽️",
     layout="wide"
 )
 
@@ -151,6 +151,33 @@ header {
     visibility: hidden;
 }
 
+/* Slider */
+
+.scroll-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 18px;
+    padding-bottom: 10px;
+}
+
+.scroll-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background: #D9232D;
+    border-radius: 10px;
+}
+
+.scroll-card {
+    min-width: 240px;
+    background: white;
+    padding: 20px;
+    border-radius: 18px;
+    border-left: 6px solid #D9232D;
+    box-shadow: 0px 4px 14px rgba(0,0,0,0.08);
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -234,17 +261,32 @@ def load_data():
     if not os.path.exists(DATA_FILE):
 
         with open(DATA_FILE, "w") as f:
-            json.dump(fresh_data, f)
+            json.dump(fresh_data, f, indent=4)
 
         return fresh_data
 
-    with open(DATA_FILE, "r") as f:
-        existing_data = json.load(f)
+    try:
 
-    for key in existing_data:
+        with open(DATA_FILE, "r") as f:
+            existing_data = json.load(f)
 
-        if key in fresh_data:
-            fresh_data[key] = existing_data[key]
+        for key in existing_data:
+
+            if key in fresh_data:
+
+                fresh_data[key].update(existing_data[key])
+
+                if "feedbacks" not in fresh_data[key]:
+                    fresh_data[key]["feedbacks"] = []
+
+                if "votes" not in fresh_data[key]:
+                    fresh_data[key]["votes"] = 0
+
+                if "total_rating" not in fresh_data[key]:
+                    fresh_data[key]["total_rating"] = 0
+
+    except:
+        fresh_data = initialize_ratings()
 
     return fresh_data
 
@@ -255,7 +297,7 @@ def load_data():
 def save_data(data):
 
     with open(DATA_FILE, "w") as f:
-        json.dump(data, f)
+        json.dump(data, f, indent=4)
 
 ratings_data = load_data()
 
@@ -311,32 +353,25 @@ meal_data = default_data[selected_meal]
 # HEADER
 # ---------------------------------------------------
 
-col1, col2 = st.columns([1,7])
+st.markdown(
+    """
+    <div class="main-title">
+    Tech Mahindra Smart Canteen
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-with col1:
-    st.image("logo.png", width=70)
-
-with col2:
-
-    st.markdown(
-        """
-        <div class="main-title">
-        Tech Mahindra Smart Canteen
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown(
-        f"""
-        <div class="sub-title">
-        Intelligent Food Experience & Feedback Platform
-        <br>
-        Currently Serving: <b>{selected_meal}</b>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+st.markdown(
+    f"""
+    <div class="sub-title">
+    Intelligent Food Experience & Feedback Platform
+    <br>
+    Currently Serving: <b>{selected_meal}</b>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 st.markdown("---")
 
@@ -373,34 +408,38 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-cols = st.columns(5)
+html_cards = ""
 
 for idx, dish in enumerate(top_dishes):
 
     stars = "★" * int(round(dish["Rating"]))
 
-    with cols[idx]:
+    html_cards += f"""
+    <div class="scroll-card">
 
-        st.markdown(
-            f"""
-            <div class="top-card">
+    <h3>{idx+1}. {dish['Food']}</h3>
 
-            <h3>{idx+1}. {dish['Food']}</h3>
+    <p><b>{dish['Vendor']}</b></p>
 
-            <p><b>{dish['Vendor']}</b></p>
+    <p style="font-size:22px; color:#D9232D;">
+    {stars}
+    </p>
 
-            <p style="font-size:22px; color:#D9232D;">
-            {stars}
-            </p>
+    <p>
+    <b>{dish['Rating']}/5</b>
+    </p>
 
-            <p>
-            <b>{dish['Rating']}/5</b>
-            </p>
+    </div>
+    """
 
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+st.markdown(
+    f"""
+    <div class="scroll-container">
+    {html_cards}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 st.markdown("---")
 
@@ -427,6 +466,14 @@ for tab, vendor in zip(tabs, vendors):
         )
 
         key = f"{selected_meal}|{vendor}|{selected_food}"
+
+        if key not in ratings_data:
+
+            ratings_data[key] = {
+                "total_rating": 0,
+                "votes": 0,
+                "feedbacks": []
+            }
 
         votes = ratings_data[key]["votes"]
 
@@ -470,11 +517,26 @@ for tab, vendor in zip(tabs, vendors):
 
             if user_rating is not None:
 
+                # SAFETY CHECKS
+
+                if "total_rating" not in ratings_data[key]:
+                    ratings_data[key]["total_rating"] = 0
+
+                if "votes" not in ratings_data[key]:
+                    ratings_data[key]["votes"] = 0
+
+                if "feedbacks" not in ratings_data[key]:
+                    ratings_data[key]["feedbacks"] = []
+
+                # SAVE RATING
+
                 ratings_data[key]["total_rating"] += (
                     user_rating + 1
                 )
 
                 ratings_data[key]["votes"] += 1
+
+                # SAVE TEXT FEEDBACK
 
                 if user_text.strip() != "":
 
@@ -484,7 +546,9 @@ for tab, vendor in zip(tabs, vendors):
 
                 save_data(ratings_data)
 
-                st.success("Feedback Submitted Successfully")
+                st.success("Feedback Submitted Successfully ✅")
+
+                st.balloons()
 
                 st.rerun()
 
