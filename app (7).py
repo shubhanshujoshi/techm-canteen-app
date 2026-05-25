@@ -3,7 +3,6 @@ from datetime import datetime
 import json
 import os
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # ---------------------------------------------------
 # PAGE CONFIG
@@ -96,6 +95,8 @@ section[data-testid="stSidebar"] {
 
     transition: 0.3s;
 }
+
+/* Hover */
 
 .food-card:hover,
 .top-card:hover,
@@ -630,20 +631,11 @@ if show_admin:
 
     st.markdown("### Orders Comparison Chart")
 
-    df = pd.DataFrame({
-        "Vendor": list(vendor_orders.keys()),
-        "Orders": list(vendor_orders.values())
-    })
+    chart_data = pd.DataFrame({
+        "Orders Served": list(vendor_orders.values())
+    }, index=list(vendor_orders.keys()))
 
-    fig, ax = plt.subplots(figsize=(10,5))
-
-    ax.plot(df["Vendor"], df["Orders"], marker='o')
-
-    ax.set_xlabel("Vendor")
-    ax.set_ylabel("Orders Served")
-    ax.set_title("Orders Served By Vendors")
-
-    st.pyplot(fig)
+    st.line_chart(chart_data)
 
 # ---------------------------------------------------
 # FOOTER
