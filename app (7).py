@@ -7,7 +7,6 @@ from datetime import datetime
 import json
 import os
 import pandas as pd
-from textblob import TextBlob
 
 # ---------------------------------------------------
 # PAGE CONFIG
