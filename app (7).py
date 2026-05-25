@@ -1,6 +1,6 @@
 # =====================================================
 # TECH MAHINDRA SMART CANTEEN SYSTEM
-# FULLY RESPONSIVE + MOBILE SWIPE VERSION
+# MOBILE SWIPE VERSION (FINAL)
 # =====================================================
 
 import streamlit as st
@@ -31,8 +31,6 @@ st.markdown("""
 html, body, [class*="css"] {
     font-family: 'Aptos', sans-serif;
 }
-
-/* MAIN APP */
 
 .stApp {
     background-color: #f5f5f5;
@@ -89,6 +87,34 @@ section[data-testid="stSidebar"] {
     0px 4px 14px rgba(0,0,0,0.08);
 
     margin-bottom: 18px;
+
+    min-height: 260px;
+}
+
+/* SWIPE CONTAINER */
+
+.swipe-container {
+
+    display: flex;
+
+    overflow-x: auto;
+
+    gap: 18px;
+
+    padding-bottom: 10px;
+
+    scroll-snap-type: x mandatory;
+}
+
+.swipe-container::-webkit-scrollbar {
+    display: none;
+}
+
+.swipe-card {
+
+    flex: 0 0 85%;
+
+    scroll-snap-align: start;
 }
 
 /* TABS */
@@ -123,6 +149,19 @@ footer {
 
 header {
     visibility: hidden;
+}
+
+/* MOBILE */
+
+@media screen and (max-width: 768px) {
+
+    .main-title {
+        font-size: 30px;
+    }
+
+    .swipe-card {
+        flex: 0 0 92%;
+    }
 }
 
 </style>
@@ -220,11 +259,7 @@ def load_data():
         for key in existing_data:
 
             if key in fresh_data:
-
                 fresh_data[key].update(existing_data[key])
-
-                if "feedbacks" not in fresh_data[key]:
-                    fresh_data[key]["feedbacks"] = []
 
     except:
         fresh_data = initialize_ratings()
@@ -239,57 +274,6 @@ def save_data(data):
 
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
-
-# =====================================================
-# SENTIMENT ANALYSIS
-# =====================================================
-
-def analyze_sentiment(feedbacks):
-
-    if not feedbacks:
-        return "🟡 Neutral"
-
-    positive_words = [
-        "good", "great", "excellent", "amazing",
-        "awesome", "tasty", "love", "nice",
-        "best", "fresh", "fantastic", "delicious"
-    ]
-
-    negative_words = [
-        "bad", "worst", "cold", "stale",
-        "awful", "hate", "poor", "dirty",
-        "disgusting", "late", "waste"
-    ]
-
-    positive_count = 0
-    negative_count = 0
-
-    for feedback in feedbacks:
-
-        feedback = feedback.lower()
-
-        for word in positive_words:
-
-            if word in feedback:
-                positive_count += 1
-
-        for word in negative_words:
-
-            if word in feedback:
-                negative_count += 1
-
-    if positive_count > negative_count:
-        return "🟢 Positive"
-
-    elif negative_count > positive_count:
-        return "🔴 Negative"
-
-    else:
-        return "🟡 Neutral"
-
-# =====================================================
-# LOAD RATINGS
-# =====================================================
 
 ratings_data = load_data()
 
@@ -322,16 +306,6 @@ auto_meal = get_current_meal()
 st.sidebar.title("Admin Controls")
 
 show_admin = st.sidebar.button("Admin View")
-
-if st.sidebar.button("Reset All Ratings"):
-
-    ratings_data = initialize_ratings()
-
-    save_data(ratings_data)
-
-    st.sidebar.success("Ratings Reset Successfully")
-
-    st.rerun()
 
 selected_meal = st.sidebar.selectbox(
     "Select Meal Time",
@@ -375,7 +349,7 @@ with col2:
 st.markdown("---")
 
 # =====================================================
-# TOP 5 DISHES
+# TOP 5 DISHES (SWIPE MODE)
 # =====================================================
 
 st.markdown("## Top 5 Highest Rated Dishes")
@@ -407,34 +381,36 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-top_cols = st.columns(len(top_dishes))
+html = '<div class="swipe-container">'
 
 for idx, dish in enumerate(top_dishes):
 
     stars = "★" * int(round(dish["Rating"]))
 
-    with top_cols[idx]:
+    html += f"""
 
-        st.markdown(
-            f"""
-            <div class="top-card">
+    <div class="swipe-card">
 
-            <h3>{idx+1}. {dish['Food']}</h3>
+        <div class="top-card">
+
+            <h2>{idx+1}. {dish['Food']}</h2>
 
             <p><b>{dish['Vendor']}</b></p>
 
-            <p style="font-size:22px; color:#D9232D;">
+            <p style="font-size:24px; color:#D9232D;">
             {stars}
             </p>
 
-            <p>
-            <b>{dish['Rating']}/5</b>
-            </p>
+            <h3>{dish['Rating']}/5</h3>
 
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        </div>
+
+    </div>
+    """
+
+html += "</div>"
+
+st.components.v1.html(html, height=320, scrolling=True)
 
 st.markdown("---")
 
@@ -444,20 +420,16 @@ st.markdown("---")
 
 st.markdown("## Rate Food Item")
 
-vendors = list(meal_data.keys())
+tabs = st.tabs(list(meal_data.keys()))
 
-tabs = st.tabs(vendors)
-
-for tab, vendor in zip(tabs, vendors):
+for tab, vendor in zip(tabs, meal_data.keys()):
 
     with tab:
 
-        foods = meal_data[vendor]
-
         selected_food = st.selectbox(
             f"Select Food - {vendor}",
-            foods,
-            key=f"{vendor}_food"
+            meal_data[vendor],
+            key=vendor
         )
 
         key = f"{selected_meal}|{vendor}|{selected_food}"
@@ -473,7 +445,7 @@ for tab, vendor in zip(tabs, vendors):
             f"""
             <div class="food-card">
 
-            <h3>{selected_food}</h3>
+            <h2>{selected_food}</h2>
 
             <p><b>Vendor:</b> {vendor}</p>
 
@@ -493,7 +465,6 @@ for tab, vendor in zip(tabs, vendors):
 
         user_text = st.text_area(
             "Optional Feedback",
-            placeholder="Write your feedback here...",
             key=f"text_{key}"
         )
 
@@ -520,147 +491,8 @@ for tab, vendor in zip(tabs, vendors):
 
                 st.success("Feedback Submitted Successfully ✅")
 
-                st.balloons()
-
                 st.rerun()
 
             else:
 
                 st.warning("Please select star rating.")
-
-st.markdown("---")
-
-# =====================================================
-# BEST SELLING DISHES
-# =====================================================
-
-st.markdown("## Best Selling Dish Of Each Vendor")
-
-best_cols = st.columns(5)
-
-for idx, vendor in enumerate(meal_data.keys()):
-
-    best_food = None
-    best_votes = -1
-    best_rating = 0
-
-    for food in meal_data[vendor]:
-
-        key = f"{selected_meal}|{vendor}|{food}"
-
-        votes = ratings_data[key]["votes"]
-
-        avg = (
-            ratings_data[key]["total_rating"] / votes
-            if votes > 0 else 0
-        )
-
-        if votes > best_votes:
-
-            best_votes = votes
-            best_food = food
-            best_rating = round(avg,1)
-
-    with best_cols[idx]:
-
-        st.markdown(
-            f"""
-            <div class="best-card">
-
-            <h4>{vendor}</h4>
-
-            <p><b>{best_food}</b></p>
-
-            <p>Rating: {best_rating}/5</p>
-
-            <p>Orders: {best_votes}</p>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-# =====================================================
-# ADMIN DASHBOARD
-# =====================================================
-
-if show_admin:
-
-    st.markdown("---")
-
-    st.markdown("## Admin Dashboard")
-
-    vendor_orders = {}
-    sentiment_scores = {}
-    wastage_data = {}
-
-    for vendor, foods in meal_data.items():
-
-        total_orders = 0
-
-        all_feedbacks = []
-
-        for food in foods:
-
-            key = f"{selected_meal}|{vendor}|{food}"
-
-            votes = ratings_data[key]["votes"]
-
-            total_orders += votes
-
-            if "feedbacks" in ratings_data[key]:
-
-                all_feedbacks.extend(
-                    ratings_data[key]["feedbacks"]
-                )
-
-        sentiment = analyze_sentiment(all_feedbacks)
-
-        vendor_orders[vendor] = total_orders
-
-        sentiment_scores[vendor] = sentiment
-
-        wastage = max(0, 100 - total_orders)
-
-        wastage_data[vendor] = wastage
-
-    admin_cols = st.columns(5)
-
-    for idx, vendor in enumerate(vendor_orders):
-
-        with admin_cols[idx]:
-
-            st.markdown(
-                f"""
-                <div class="admin-card">
-
-                <h4>{vendor}</h4>
-
-                <p><b>Total Orders:</b> {vendor_orders[vendor]}</p>
-
-                <p><b>Customer Sentiment:</b><br>{sentiment_scores[vendor]}</p>
-
-                <p><b>Food Wastage Reduced:</b> {wastage_data[vendor]}%</p>
-
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-    st.markdown("### Orders Comparison Chart")
-
-    chart_data = pd.DataFrame({
-        "Orders Served": list(vendor_orders.values())
-    }, index=list(vendor_orders.keys()))
-
-    st.bar_chart(chart_data)
-
-# =====================================================
-# FOOTER
-# =====================================================
-
-st.markdown("---")
-
-st.caption(
-    "Built for Tech Mahindra Smart Canteen Management System"
-)
