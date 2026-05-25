@@ -1,6 +1,6 @@
 # =====================================================
 # TECH MAHINDRA SMART CANTEEN SYSTEM
-# MOBILE OPTIMIZED VERSION
+# FULLY FIXED MOBILE + DESKTOP VERSION
 # =====================================================
 
 import streamlit as st
@@ -34,20 +34,20 @@ html, body, [class*="css"] {
     color: #111111 !important;
 }
 
-/* MAIN APP */
-
 .stApp {
     background-color: #f4f4f4;
     color: #111111 !important;
 }
 
-/* FORCE TEXT VISIBILITY */
+/* FORCE DARK MODE TEXT VISIBILITY */
 
-h1, h2, h3, h4, h5, h6, p, span, label, div {
+h1, h2, h3, h4, h5, h6, p, span, div, label {
     color: #111111 !important;
 }
 
-/* TITLE */
+/* =====================================================
+TITLE
+===================================================== */
 
 .main-title {
     font-size: 42px;
@@ -56,93 +56,139 @@ h1, h2, h3, h4, h5, h6, p, span, label, div {
 }
 
 .sub-title {
+    font-size: 18px;
     color: #444 !important;
-    font-size: 17px;
     margin-top: -10px;
 }
 
-/* BUTTON */
+/* =====================================================
+BUTTONS
+===================================================== */
 
 .stButton > button {
-    background-color: #D9232D;
-    color: white !important;
-    border-radius: 12px;
-    border: none;
-    padding: 12px;
-    font-weight: bold;
+
     width: 100%;
+
+    background-color: #D9232D;
+
+    color: white !important;
+
+    border: none;
+
+    border-radius: 12px;
+
+    padding: 12px;
+
+    font-weight: bold;
+
+    transition: 0.3s;
 }
 
 .stButton > button:hover {
-    background-color: #b71c24;
-    color: white;
+
+    background-color: #b81c24;
 }
 
-/* INPUTS */
+/* =====================================================
+INPUTS
+===================================================== */
 
-textarea, input {
-    background-color: white !important;
+textarea,
+input {
+    background: white !important;
     color: black !important;
 }
 
 /* =====================================================
-TOP FOOD SLIDER
+SLIDER
 ===================================================== */
 
 .slider-container {
+
     display: flex;
+
     overflow-x: auto;
+
     gap: 18px;
-    padding-bottom: 15px;
+
+    padding: 10px 5px 20px 5px;
+
     scroll-behavior: smooth;
 }
 
 .slider-container::-webkit-scrollbar {
+
     height: 8px;
 }
 
 .slider-container::-webkit-scrollbar-thumb {
+
     background: #D9232D;
+
     border-radius: 20px;
 }
 
-/* FOOD CARD */
+/* =====================================================
+FOOD CARD
+===================================================== */
 
 .food-card {
+
     min-width: 280px;
+
     max-width: 280px;
+
     background: white;
+
     border-radius: 24px;
-    padding: 22px;
+
+    padding: 24px;
+
     flex-shrink: 0;
+
     border-left: 7px solid #D9232D;
+
     box-shadow: 0px 6px 18px rgba(0,0,0,0.08);
 }
 
 .food-title {
-    font-size: 34px;
+
+    font-size: 32px;
+
     font-weight: 800;
-    margin-bottom: 12px;
+
     color: #111111 !important;
+
+    margin-bottom: 12px;
 }
 
 .food-vendor {
-    font-size: 20px;
+
+    font-size: 18px;
+
     font-weight: 600;
-    color: #444 !important;
+
+    color: #555 !important;
 }
 
 .food-stars {
-    color: #D9232D !important;
+
     font-size: 28px;
-    margin-top: 20px;
+
+    color: #D9232D !important;
+
+    margin-top: 18px;
 }
 
 .food-rating {
-    font-size: 42px;
+
+    font-size: 38px;
+
     font-weight: 800;
-    margin-top: 25px;
+
     color: #111111 !important;
+
+    margin-top: 20px;
 }
 
 /* =====================================================
@@ -150,11 +196,17 @@ INFO CARD
 ===================================================== */
 
 .info-card {
+
     background: white;
+
     padding: 22px;
+
     border-radius: 20px;
+
     border-left: 6px solid #D9232D;
-    box-shadow: 0px 6px 16px rgba(0,0,0,0.08);
+
+    box-shadow: 0px 4px 14px rgba(0,0,0,0.08);
+
     margin-bottom: 20px;
 }
 
@@ -177,12 +229,13 @@ MOBILE
     }
 
     .food-rating {
-        font-size: 34px;
+        font-size: 32px;
     }
-
 }
 
-/* HIDE STREAMLIT */
+/* =====================================================
+HIDE STREAMLIT BRANDING
+===================================================== */
 
 #MainMenu {
     visibility: hidden;
@@ -243,7 +296,7 @@ default_data = {
 }
 
 # =====================================================
-# INITIALIZE DATA
+# INITIALIZE RATINGS
 # =====================================================
 
 def initialize_ratings():
@@ -357,53 +410,54 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-slider_html = '<div class="slider-container">'
+slider_html = """
+<div class="slider-container">
+"""
 
 for idx, dish in enumerate(top_dishes):
 
     stars = "★" * int(round(dish["Rating"]))
 
     slider_html += f"""
-
     <div class="food-card">
 
         <div class="food-title">
-        {idx+1}. {dish['Food']}
+            {idx+1}. {dish['Food']}
         </div>
 
         <div class="food-vendor">
-        {dish['Vendor']}
+            {dish['Vendor']}
         </div>
 
         <div class="food-stars">
-        {stars}
+            {stars}
         </div>
 
         <div class="food-rating">
-        {dish['Rating']}/5
+            {dish['Rating']}/5
         </div>
 
     </div>
-
     """
 
 slider_html += "</div>"
 
-st.markdown(slider_html, unsafe_allow_html=True)
+st.markdown(
+    slider_html,
+    unsafe_allow_html=True
+)
 
 st.markdown("---")
 
 # =====================================================
-# RATE FOOD SECTION
+# RATE FOOD ITEM
 # =====================================================
 
 st.markdown("## 🍴 Rate Food Item")
 
-vendors = list(default_data.keys())
-
 selected_vendor = st.selectbox(
     "Select Vendor",
-    vendors
+    list(default_data.keys())
 )
 
 selected_food = st.selectbox(
@@ -434,14 +488,26 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+# =====================================================
+# STAR RATING
+# =====================================================
+
 user_rating = st.feedback(
     "stars",
     key="rating"
 )
 
+# =====================================================
+# TEXT FEEDBACK
+# =====================================================
+
 user_feedback = st.text_area(
     "Write Feedback"
 )
+
+# =====================================================
+# SUBMIT BUTTON
+# =====================================================
 
 if st.button("Submit Feedback"):
 
@@ -461,13 +527,17 @@ if st.button("Submit Feedback"):
 
         save_data(ratings_data)
 
-        st.success("✅ Feedback Submitted Successfully")
+        st.success(
+            "✅ Feedback Submitted Successfully"
+        )
 
         st.rerun()
 
     else:
 
-        st.warning("Please select star rating")
+        st.warning(
+            "Please select star rating"
+        )
 
 st.markdown("---")
 
@@ -496,7 +566,9 @@ for idx, vendor in enumerate(default_data.keys()):
 
         <h3>{vendor}</h3>
 
-        <p><b>Total Orders:</b> {total_votes}</p>
+        <p>
+        <b>Total Orders:</b> {total_votes}
+        </p>
 
         </div>
         """, unsafe_allow_html=True)
