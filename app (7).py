@@ -30,11 +30,11 @@ html, body, [class*="css"] {
 /* Main App */
 
 .stApp {
-    background-color: #f7f7f7;
+    background-color: #f5f5f5;
     color: #111111;
 }
 
-/* Main Title */
+/* Title */
 
 .main-title {
     font-size: 42px;
@@ -123,39 +123,18 @@ section[data-testid="stSidebar"] {
     border-radius: 10px;
 }
 
-/* Feedback stars */
+/* Feedback Stars */
 
 [data-testid="stFeedback"] button {
-    transform: scale(1.7);
+    transform: scale(1.6);
     margin-right: 10px;
 }
 
-/* Slider */
+/* Inputs */
 
-.top-slider {
-    display: flex;
-    overflow-x: auto;
-    gap: 20px;
-    padding-bottom: 10px;
-}
-
-.top-slider::-webkit-scrollbar {
-    height: 8px;
-}
-
-.top-slider::-webkit-scrollbar-thumb {
-    background: #D9232D;
-    border-radius: 10px;
-}
-
-.slide-card {
-    min-width: 280px;
-    background: white;
-    padding: 24px;
-    border-radius: 18px;
-    border-top: 6px solid #D9232D;
-    box-shadow: 0px 4px 14px rgba(0,0,0,0.08);
-    flex-shrink: 0;
+.stTextArea textarea,
+.stSelectbox div[data-baseweb="select"] {
+    border-radius: 10px !important;
 }
 
 /* Footer */
@@ -281,7 +260,7 @@ def save_data(data):
 ratings_data = load_data()
 
 # ---------------------------------------------------
-# MEAL LOGIC
+# CURRENT MEAL
 # ---------------------------------------------------
 
 current_hour = datetime.now().hour
@@ -316,7 +295,7 @@ if st.sidebar.button("Reset All Ratings"):
 
     save_data(ratings_data)
 
-    st.sidebar.success("All Ratings Reset")
+    st.sidebar.success("Ratings Reset Successfully")
 
     st.rerun()
 
@@ -362,7 +341,7 @@ with col2:
 st.markdown("---")
 
 # ---------------------------------------------------
-# SECTION 1 TOP 5 SLIDER
+# TOP 5 HIGHEST RATED
 # ---------------------------------------------------
 
 st.markdown("## Top 5 Highest Rated Dishes")
@@ -385,7 +364,7 @@ for vendor, foods in meal_data.items():
         top_dishes.append({
             "Food": food,
             "Vendor": vendor,
-            "Rating": round(avg,1)
+            "Rating": round(avg, 1)
         })
 
 top_dishes = sorted(
@@ -394,34 +373,39 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-slider_html = '<div class="top-slider">'
+cols = st.columns(5)
 
-for i, dish in enumerate(top_dishes):
+for idx, dish in enumerate(top_dishes):
 
     stars = "★" * int(round(dish["Rating"]))
 
-    slider_html += f"""
-    <div class="slide-card">
+    with cols[idx]:
 
-    <h3>{i+1}. {dish['Food']}</h3>
+        st.markdown(
+            f"""
+            <div class="top-card">
 
-    <p><b>{dish['Vendor']}</b></p>
+            <h3>{idx+1}. {dish['Food']}</h3>
 
-    <p>{stars}</p>
+            <p><b>{dish['Vendor']}</b></p>
 
-    <p>{dish['Rating']}/5</p>
+            <p style="font-size:22px; color:#D9232D;">
+            {stars}
+            </p>
 
-    </div>
-    """
+            <p>
+            <b>{dish['Rating']}/5</b>
+            </p>
 
-slider_html += "</div>"
-
-st.markdown(slider_html, unsafe_allow_html=True)
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 st.markdown("---")
 
 # ---------------------------------------------------
-# SECTION 2 RATE FOOD
+# RATE FOOD SECTION
 # ---------------------------------------------------
 
 st.markdown("## Rate Food Item")
@@ -511,7 +495,7 @@ for tab, vendor in zip(tabs, vendors):
 st.markdown("---")
 
 # ---------------------------------------------------
-# SECTION 3 BEST SELLERS
+# BEST SELLING DISHES
 # ---------------------------------------------------
 
 st.markdown("## Best Selling Dish Of Each Vendor")
@@ -561,7 +545,7 @@ for idx, vendor in enumerate(meal_data.keys()):
         )
 
 # ---------------------------------------------------
-# ADMIN VIEW
+# ADMIN DASHBOARD
 # ---------------------------------------------------
 
 if show_admin:
@@ -606,11 +590,11 @@ if show_admin:
 
     st.markdown("### Vendor Performance")
 
-    cols = st.columns(len(vendor_orders))
+    admin_cols = st.columns(len(vendor_orders))
 
     for idx, vendor in enumerate(vendor_orders):
 
-        with cols[idx]:
+        with admin_cols[idx]:
 
             st.markdown(
                 f"""
