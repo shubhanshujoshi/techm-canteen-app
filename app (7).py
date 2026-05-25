@@ -3,9 +3,9 @@ from datetime import datetime
 import json
 import os
 
-# =====================================================
+# ---------------------------------------------------
 # PAGE CONFIG
-# =====================================================
+# ---------------------------------------------------
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
@@ -13,110 +13,40 @@ st.set_page_config(
     layout="wide"
 )
 
-# =====================================================
-# CSS
-# =====================================================
+# ---------------------------------------------------
+# CUSTOM CSS
+# ---------------------------------------------------
 
 st.markdown("""
 <style>
 
+/* ---------------------------------------------------
+IMPORT FONT
+--------------------------------------------------- */
+
+@import url('https://fonts.cdnfonts.com/css/aptos');
+
+/* ---------------------------------------------------
+GLOBAL STYLING
+--------------------------------------------------- */
+
 html, body, [class*="css"] {
-    font-family: "Segoe UI", sans-serif;
+    font-family: 'Aptos', sans-serif;
+    background-color: #f7f7f7;
+    color: #111111;
 }
 
-/* LIGHT MODE */
+/* ---------------------------------------------------
+MAIN APP
+--------------------------------------------------- */
 
 .stApp {
-    background-color: #f5f5f5;
-    color: #111111;
+    background-color: #f7f7f7;
 }
 
-/* TITLE */
-
-.main-title {
-    font-size: 36px;
-    font-weight: 700;
-    background: linear-gradient(90deg, #E20031, #ff4d6d);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.sub-title {
-    color: #555555;
-    font-size: 16px;
-}
-
-/* CARD */
-
-.card {
-    background: white;
-    border-radius: 18px;
-    padding: 18px;
-    border-top: 5px solid #E20031;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
-    text-align: center;
-    min-width: 240px;
-    max-width: 240px;
-    flex-shrink: 0;
-    color: #111111;
-}
-
-/* FEEDBACK CARD */
-
-.feedback-card {
-    background: white;
-    border-radius: 18px;
-    padding: 18px;
-    border-left: 5px solid #E20031;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
-    min-width: 300px;
-    max-width: 300px;
-    flex-shrink: 0;
-}
-
-/* SCROLL ROW */
-
-.scroll-row {
-    display: flex;
-    overflow-x: auto;
-    gap: 16px;
-    padding-bottom: 12px;
-    scroll-behavior: smooth;
-}
-
-.scroll-row::-webkit-scrollbar {
-    height: 8px;
-}
-
-.scroll-row::-webkit-scrollbar-thumb {
-    background: #E20031;
-    border-radius: 10px;
-}
-
-/* BUTTON */
-
-.stButton > button {
-    background-color: #E20031;
-    color: white;
-    border-radius: 10px;
-    border: none;
-    width: 100%;
-    font-weight: 600;
-}
-
-.stButton > button:hover {
-    background-color: #b80028;
-    color: white;
-}
-
-/* BIGGER STARS */
-
-[data-testid="stFeedback"] button {
-    transform: scale(1.7);
-    margin-right: 10px;
-}
-
-/* DARK MODE */
+/* ---------------------------------------------------
+DARK MODE
+--------------------------------------------------- */
 
 @media (prefers-color-scheme: dark) {
 
@@ -125,73 +55,258 @@ html, body, [class*="css"] {
         color: white !important;
     }
 
-    html, body, p, h1, h2, h3, h4, h5, h6,
-    label, span, div {
+    p, h1, h2, h3, h4, h5, h6, label, div, span {
         color: white !important;
     }
 
-    .sub-title {
-        color: #cccccc !important;
-    }
-
-    .card {
-        background: #1e1e1e !important;
-        color: white !important;
-    }
-
-    .feedback-card {
-        background: #1e1e1e !important;
-        color: white !important;
-    }
-
-    .stSelectbox div[data-baseweb="select"] {
-        background-color: #1e1e1e !important;
-        color: white !important;
-    }
-
-    .stTextArea textarea {
-        background-color: #1e1e1e !important;
+    .food-card,
+    .top-rated-box,
+    .best-seller-box {
+        background-color: #1c1c1c !important;
         color: white !important;
     }
 
     section[data-testid="stSidebar"] {
-        background-color: #1a1a1a !important;
+        background-color: #171717 !important;
+    }
+
+    .stTextInput > div > div > input,
+    .stSelectbox > div > div {
+        background-color: #262626 !important;
+        color: white !important;
     }
 }
 
-/* MOBILE */
+/* ---------------------------------------------------
+MAIN TITLE
+--------------------------------------------------- */
 
-@media (max-width: 768px) {
+.main-title {
 
-    .main-title {
-        font-size: 26px;
-    }
+    font-size: 40px;
+    font-weight: 700;
+    color: #D9232D;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
 
-    .card {
-        min-width: 85%;
-        max-width: 85%;
-    }
+/* ---------------------------------------------------
+SUB TITLE
+--------------------------------------------------- */
 
-    .feedback-card {
-        min-width: 90%;
-        max-width: 90%;
-    }
+.sub-title {
 
+    font-size: 16px;
+    color: #555555;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+/* ---------------------------------------------------
+SECTION HEADINGS
+--------------------------------------------------- */
+
+h2 {
+    color: #D9232D !important;
+    font-weight: 700 !important;
+    margin-top: 10px !important;
+    margin-bottom: 20px !important;
+}
+
+/* ---------------------------------------------------
+CARDS
+--------------------------------------------------- */
+
+.food-card,
+.top-rated-box,
+.best-seller-box {
+
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 20px;
+
+    border-left: 6px solid #D9232D;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,0.08);
+
+    transition: all 0.3s ease;
+
+    text-align: center;
+}
+
+/* Hover Effect */
+
+.food-card:hover,
+.top-rated-box:hover,
+.best-seller-box:hover {
+
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.14);
+}
+
+/* ---------------------------------------------------
+CARD TEXT
+--------------------------------------------------- */
+
+.food-card h3,
+.top-rated-box h4,
+.best-seller-box h4 {
+
+    color: #D9232D;
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------
+BUTTONS
+--------------------------------------------------- */
+
+.stButton > button {
+
+    background-color: #D9232D;
+    color: white;
+
+    border: none;
+
+    border-radius: 12px;
+
+    padding: 12px 18px;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    width: 100%;
+
+    transition: all 0.3s ease;
+}
+
+/* Button Hover */
+
+.stButton > button:hover {
+
+    background-color: #b71c26;
+    transform: scale(1.02);
+    color: white;
+}
+
+/* ---------------------------------------------------
+TABS
+--------------------------------------------------- */
+
+.stTabs [data-baseweb="tab"] {
+
+    font-size: 15px;
+    font-weight: 600;
+
+    padding: 10px 20px;
+
+    border-radius: 10px;
+
+    color: #D9232D;
+
+    transition: all 0.2s ease;
+}
+
+/* Active Tab */
+
+.stTabs [aria-selected="true"] {
+
+    background-color: #D9232D !important;
+    color: white !important;
+}
+
+/* ---------------------------------------------------
+SIDEBAR
+--------------------------------------------------- */
+
+section[data-testid="stSidebar"] {
+
+    background-color: white;
+    border-right: 1px solid #e5e5e5;
+}
+
+/* Sidebar Headings */
+
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3 {
+
+    color: #D9232D !important;
+}
+
+/* ---------------------------------------------------
+SELECTBOX
+--------------------------------------------------- */
+
+.stSelectbox > div > div {
+
+    border-radius: 10px !important;
+    border: 1px solid #d0d0d0 !important;
+}
+
+/* ---------------------------------------------------
+RATING STARS
+--------------------------------------------------- */
+
+[data-testid="stFeedback"] button {
+
+    transform: scale(1.7);
+    margin-right: 10px;
+}
+
+/* ---------------------------------------------------
+HORIZONTAL LINE
+--------------------------------------------------- */
+
+hr {
+
+    border: none;
+    height: 1px;
+
+    background: linear-gradient(
+        to right,
+        transparent,
+        #D9232D,
+        transparent
+    );
+}
+
+/* ---------------------------------------------------
+FOOTER
+--------------------------------------------------- */
+
+footer {
+
+    visibility: hidden;
+}
+
+/* ---------------------------------------------------
+STREAMLIT MENU HIDE
+--------------------------------------------------- */
+
+#MainMenu {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# =====================================================
-# FILES
-# =====================================================
+# ---------------------------------------------------
+# DATA FILE
+# ---------------------------------------------------
 
 DATA_FILE = "ratings_data.json"
-FEEDBACK_FILE = "food_feedback.json"
 
-# =====================================================
+# ---------------------------------------------------
 # FOOD DATA
-# =====================================================
+# ---------------------------------------------------
 
 default_data = {
 
@@ -228,9 +343,9 @@ default_data = {
     }
 }
 
-# =====================================================
+# ---------------------------------------------------
 # INITIALIZE RATINGS
-# =====================================================
+# ---------------------------------------------------
 
 def initialize_ratings():
 
@@ -251,9 +366,9 @@ def initialize_ratings():
 
     return ratings
 
-# =====================================================
+# ---------------------------------------------------
 # LOAD DATA
-# =====================================================
+# ---------------------------------------------------
 
 def load_data():
 
@@ -274,11 +389,14 @@ def load_data():
         if key in fresh_data:
             fresh_data[key] = existing_data[key]
 
+    with open(DATA_FILE, "w") as f:
+        json.dump(fresh_data, f)
+
     return fresh_data
 
-# =====================================================
+# ---------------------------------------------------
 # SAVE DATA
-# =====================================================
+# ---------------------------------------------------
 
 def save_data(data):
 
@@ -287,9 +405,25 @@ def save_data(data):
 
 ratings_data = load_data()
 
-# =====================================================
-# CURRENT MEAL
-# =====================================================
+# ---------------------------------------------------
+# RESET BUTTON
+# ---------------------------------------------------
+
+st.sidebar.markdown("## Controls")
+
+if st.sidebar.button("Reset All Ratings"):
+
+    ratings_data = initialize_ratings()
+
+    save_data(ratings_data)
+
+    st.sidebar.success("Ratings Reset Successfully")
+
+    st.rerun()
+
+# ---------------------------------------------------
+# MEAL LOGIC
+# ---------------------------------------------------
 
 current_hour = datetime.now().hour
 
@@ -309,9 +443,9 @@ def get_current_meal():
 
 auto_meal = get_current_meal()
 
-# =====================================================
+# ---------------------------------------------------
 # SIDEBAR
-# =====================================================
+# ---------------------------------------------------
 
 st.sidebar.title("Meal Filters")
 
@@ -321,48 +455,46 @@ selected_meal = st.sidebar.selectbox(
     index=["Breakfast", "Lunch", "Snacks", "Dinner"].index(auto_meal)
 )
 
-# RESET BUTTON
-
-if st.sidebar.button(" Reset All Ratings"):
-
-    ratings_data = initialize_ratings()
-
-    save_data(ratings_data)
-
-    st.sidebar.success("All ratings reset successfully")
-
-    st.rerun()
+current_meal = selected_meal
 
 meal_data = default_data[selected_meal]
 
-# =====================================================
+# ---------------------------------------------------
 # HEADER
-# =====================================================
+# ---------------------------------------------------
 
-col1, col2 = st.columns([1, 8])
+col1, col2 = st.columns([1, 7])
 
 with col1:
-    st.image("logo.png", width=70)
+    st.image("logo.png", width=65)
 
 with col2:
 
-    st.markdown("""
-<div class="main-title">
-Tech Mahindra Smart Canteen
-</div>
-""", unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="main-title">
+            Tech Mahindra Smart Canteen
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-    st.markdown(f"""
-<div class="sub-title">
-Currently Serving: <b>{selected_meal}</b>
-</div>
-""", unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class="sub-title">
+            Intelligent Food Experience & Feedback Platform
+            <br>
+            Currently Serving: <b>{current_meal}</b>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 st.markdown("---")
 
-# =====================================================
+# ---------------------------------------------------
 # TOP 5
-# =====================================================
+# ---------------------------------------------------
 
 st.markdown("## Top 5 Highest Rated Dishes")
 
@@ -374,214 +506,87 @@ for vendor, foods in meal_data.items():
 
         key = f"{selected_meal}|{vendor}|{food}"
 
+        total_rating = ratings_data[key]["total_rating"]
         votes = ratings_data[key]["votes"]
-        total = ratings_data[key]["total_rating"]
 
-        avg = round(total / votes, 1) if votes > 0 else 0
+        avg_rating = (
+            round(total_rating / votes, 1)
+            if votes > 0 else 0
+        )
 
         top_dishes.append({
-            "food": food,
-            "vendor": vendor,
-            "rating": avg
+            "Food": food,
+            "Vendor": vendor,
+            "Rating": avg_rating
         })
 
 top_dishes = sorted(
     top_dishes,
-    key=lambda x: x["rating"],
+    key=lambda x: x["Rating"],
     reverse=True
-)[:5]
+)
 
-html = '<div class="scroll-row">'
+row1 = st.columns(3)
 
-for dish in top_dishes:
+for i in range(3):
 
-    stars = "⭐" * int(round(dish["rating"]))
+    if i < len(top_dishes):
 
-    html += f'''
-<div class="card">
-<h3>{dish["food"]}</h3>
-<p><b>{dish["vendor"]}</b></p>
-<h2>{stars}</h2>
-<p>{dish["rating"]}/5</p>
-</div>
-'''
+        dish = top_dishes[i]
 
-html += '</div>'
+        stars = "★" * int(round(dish["Rating"]))
 
-st.markdown(html, unsafe_allow_html=True)
+        with row1[i]:
 
-st.markdown("---")
+            st.markdown(
+                f"""
+                <div class="top-rated-box">
 
-# =====================================================
-# FOOD FEEDBACK & RATING
-# =====================================================
+                <h4>{i+1}. {dish['Food']}</h4>
 
-st.markdown("## Food Feedback & Rating")
+                <p><b>{dish['Vendor']}</b></p>
 
-vendors = list(meal_data.keys())
+                <p>{stars} ({dish['Rating']}/5)</p>
 
-tabs = st.tabs(vendors)
-
-for tab, vendor in zip(tabs, vendors):
-
-    with tab:
-
-        foods = meal_data[vendor]
-
-        selected_food = st.selectbox(
-            f"Select Food - {vendor}",
-            foods,
-            key=f"feedback_{vendor}"
-        )
-
-        key = f"{selected_meal}|{vendor}|{selected_food}"
-
-        votes = ratings_data[key]["votes"]
-        total = ratings_data[key]["total_rating"]
-
-        avg = round(total / votes, 1) if votes > 0 else 0
-
-        stars = "⭐" * int(round(avg))
-
-        st.markdown(f'''
-<div class="card">
-<h3>{selected_food}</h3>
-<h2>{stars}</h2>
-<p><b>{avg}/5 Rating</b></p>
-<p>{votes} Votes</p>
-</div>
-''', unsafe_allow_html=True)
-
-        st.markdown("### Rate This Food")
-
-        user_rating = st.feedback(
-            "stars",
-            key=f"rating_{key}"
-        )
-
-        feedback_text = st.text_area(
-            "Write Your Feedback",
-            placeholder="Taste, hygiene, quality etc.",
-            key=f"text_{vendor}"
-        )
-
-        col1, col2 = st.columns(2)
-
-        # =====================================================
-        # SUBMIT
-        # =====================================================
-
-        with col1:
-
-            if st.button(
-                f"Submit Rating & Feedback - {vendor}",
-                key=f"btn_feedback_{vendor}"
-            ):
-
-                # SAVE RATING
-
-                if user_rating is not None:
-
-                    ratings_data[key]["total_rating"] += user_rating + 1
-                    ratings_data[key]["votes"] += 1
-
-                    save_data(ratings_data)
-
-                # SAVE ONLY IF TEXT FEEDBACK EXISTS
-
-                if feedback_text.strip() != "":
-
-                    feedback_data = []
-
-                    if os.path.exists(FEEDBACK_FILE):
-
-                        with open(FEEDBACK_FILE, "r") as f:
-                            feedback_data = json.load(f)
-
-                    feedback_data.append({
-                        "meal": selected_meal,
-                        "vendor": vendor,
-                        "food": selected_food,
-                        "feedback": feedback_text,
-                        "rating": user_rating + 1 if user_rating is not None else "Not Rated",
-                        "time": str(datetime.now())
-                    })
-
-                    with open(FEEDBACK_FILE, "w") as f:
-                        json.dump(feedback_data, f)
-
-                st.success("Feedback Submitted Successfully")
-
-                st.rerun()
-
-        # =====================================================
-        # RECENT FEEDBACKS
-        # =====================================================
-
-        with col2:
-
-            show_feedback = st.button(
-                f" Recent Feedbacks - {vendor}",
-                key=f"recent_feedback_{vendor}"
+                </div>
+                """,
+                unsafe_allow_html=True
             )
 
-        if show_feedback:
+space1, col1, col2, space2 = st.columns([0.5,1,1,0.5])
 
-            if os.path.exists(FEEDBACK_FILE):
+for idx, col in zip([3,4], [col1,col2]):
 
-                with open(FEEDBACK_FILE, "r") as f:
-                    feedback_data = json.load(f)
+    if idx < len(top_dishes):
 
-                # ONLY FEEDBACKS WITH ACTUAL TEXT
+        dish = top_dishes[idx]
 
-                vendor_feedbacks = [
-                    x for x in reversed(feedback_data)
-                    if x["vendor"] == vendor
-                    and x["feedback"].strip() != ""
-                ]
+        stars = "★" * int(round(dish["Rating"]))
 
-                if vendor_feedbacks:
+        with col:
 
-                    feedback_html = '<div class="scroll-row">'
+            st.markdown(
+                f"""
+                <div class="top-rated-box">
 
-                    for item in vendor_feedbacks[:10]:
+                <h4>{idx+1}. {dish['Food']}</h4>
 
-                        feedback_html += f'''
-<div class="feedback-card">
+                <p><b>{dish['Vendor']}</b></p>
 
-<h4>{item["food"]}</h4>
+                <p>{stars} ({dish['Rating']}/5)</p>
 
-<p><b>⭐ Rating:</b> {item["rating"]}</p>
-
-<p style="margin-top:10px;">
-{item["feedback"]}
-</p>
-
-<p style="font-size:12px; opacity:0.7; margin-top:10px;">
-{item["time"][:19]}
-</p>
-
-</div>
-'''
-
-                    feedback_html += '</div>'
-
-                    st.markdown(
-                        feedback_html,
-                        unsafe_allow_html=True
-                    )
-
-                else:
-
-                    st.info("No verbal feedback available yet.")
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
 st.markdown("---")
 
-# =====================================================
+# ---------------------------------------------------
 # BEST SELLERS
-# =====================================================
+# ---------------------------------------------------
 
-st.markdown("## Best Selling Food Item Of Each Vendor")
+st.markdown("## Best Selling Dish Of Each Vendor")
 
 best_sellers = []
 
@@ -596,49 +601,182 @@ for vendor, foods in meal_data.items():
         key = f"{selected_meal}|{vendor}|{food}"
 
         votes = ratings_data[key]["votes"]
-        total = ratings_data[key]["total_rating"]
+        total_rating = ratings_data[key]["total_rating"]
 
-        avg = round(total / votes, 1) if votes > 0 else 0
+        avg_rating = (
+            round(total_rating / votes, 1)
+            if votes > 0 else 0
+        )
 
         if votes > best_votes:
 
             best_votes = votes
             best_food = food
-            best_rating = avg
+            best_rating = avg_rating
 
     best_sellers.append({
-        "vendor": vendor,
-        "food": best_food,
-        "rating": best_rating,
-        "votes": best_votes
+        "Vendor": vendor,
+        "Food": best_food,
+        "Rating": best_rating
     })
 
-html = '<div class="scroll-row">'
+best_sellers = sorted(
+    best_sellers,
+    key=lambda x: x["Rating"],
+    reverse=True
+)
 
-for item in best_sellers:
+row1 = st.columns(3)
 
-    stars = "⭐" * int(round(item["rating"]))
+for i in range(3):
 
-    html += f'''
-<div class="card">
-<h3>{item["vendor"]}</h3>
-<p><b>{item["food"]}</b></p>
-<h2>{stars}</h2>
-<p>{item["rating"]}/5</p>
-<p>{item["votes"]} Votes</p>
-</div>
-'''
+    if i < len(best_sellers):
 
-html += '</div>'
+        item = best_sellers[i]
 
-st.markdown(html, unsafe_allow_html=True)
+        stars = "★" * int(round(item["Rating"]))
 
-# =====================================================
+        with row1[i]:
+
+            st.markdown(
+                f"""
+                <div class="best-seller-box">
+
+                <h4>{i+1}. {item['Vendor']}</h4>
+
+                <p><b>{item['Food']}</b></p>
+
+                <p>{stars} ({item['Rating']}/5)</p>
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+space1, col1, col2, space2 = st.columns([0.5,1,1,0.5])
+
+for idx, col in zip([3,4], [col1,col2]):
+
+    if idx < len(best_sellers):
+
+        item = best_sellers[idx]
+
+        stars = "★" * int(round(item["Rating"]))
+
+        with col:
+
+            st.markdown(
+                f"""
+                <div class="best-seller-box">
+
+                <h4>{idx+1}. {item['Vendor']}</h4>
+
+                <p><b>{item['Food']}</b></p>
+
+                <p>{stars} ({item['Rating']}/5)</p>
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+st.markdown("---")
+
+# ---------------------------------------------------
+# RATE FOOD SECTION
+# ---------------------------------------------------
+
+st.markdown("## Rate The Food")
+
+vendors = list(meal_data.keys())
+
+tabs = st.tabs(vendors)
+
+for tab, vendor in zip(tabs, vendors):
+
+    with tab:
+
+        st.markdown(f"### {vendor}")
+
+        foods = meal_data[vendor]
+
+        selected_food = st.selectbox(
+            f"Select Food Item - {vendor}",
+            foods,
+            key=f"dropdown_{vendor}"
+        )
+
+        key = f"{selected_meal}|{vendor}|{selected_food}"
+
+        total_rating = ratings_data[key]["total_rating"]
+        votes = ratings_data[key]["votes"]
+
+        avg_rating = (
+            round(total_rating / votes, 1)
+            if votes > 0 else 0
+        )
+
+        stars = "★" * int(round(avg_rating))
+
+        st.markdown(
+            f"""
+            <div class="food-card">
+
+            <h3>{selected_food}</h3>
+
+            <p>
+            <b>Live Rating:</b>
+            {stars} ({avg_rating}/5)
+            </p>
+
+            <p>
+            <b>Total Votes:</b> {votes}
+            </p>
+
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        user_rating = st.feedback(
+            "stars",
+            key=f"feedback_{key}"
+        )
+
+        if st.button(
+            f"Submit Rating for {selected_food}",
+            key=f"btn_{key}"
+        ):
+
+            if user_rating is not None:
+
+                ratings_data[key]["total_rating"] += (
+                    user_rating + 1
+                )
+
+                ratings_data[key]["votes"] += 1
+
+                save_data(ratings_data)
+
+                st.success(
+                    f"You rated {selected_food} "
+                    f"{user_rating + 1} stars"
+                )
+
+                st.rerun()
+
+            else:
+
+                st.warning(
+                    "Please select stars before submitting."
+                )
+
+# ---------------------------------------------------
 # FOOTER
-# =====================================================
+# ---------------------------------------------------
 
 st.markdown("---")
 
 st.caption(
-    "Built for Tech Mahindra Smart Canteen Management System"
+    "Built for Tech Mahindra Canteen Management System"
 )
