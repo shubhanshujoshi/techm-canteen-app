@@ -89,6 +89,8 @@ section[data-testid="stSidebar"] {
 
     box-shadow:
     0px 4px 14px rgba(0,0,0,0.08);
+
+    transition: 0.3s;
 }
 
 /* TABS */
@@ -123,6 +125,38 @@ footer {
 
 header {
     visibility: hidden;
+}
+
+/* MOBILE SWIPE */
+
+.mobile-scroll {
+
+    display: flex;
+    overflow-x: auto;
+
+    gap: 16px;
+
+    padding-bottom: 10px;
+    padding-top: 5px;
+
+    scroll-behavior: smooth;
+}
+
+.mobile-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.mobile-scroll::-webkit-scrollbar-thumb {
+    background: #D9232D;
+    border-radius: 10px;
+}
+
+.mobile-card {
+
+    min-width: 280px;
+    max-width: 280px;
+
+    flex-shrink: 0;
 }
 
 </style>
@@ -403,17 +437,17 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-cols = st.columns(5)
+cards_html = '<div class="mobile-scroll">'
 
 for idx, dish in enumerate(top_dishes):
 
     stars = "★" * int(round(dish["Rating"]))
 
-    with cols[idx]:
+    cards_html += f"""
 
-        st.markdown(
-            f"""
-            <div class="top-card">
+    <div class="mobile-card">
+
+        <div class="top-card">
 
             <h3>{idx+1}. {dish['Food']}</h3>
 
@@ -427,10 +461,14 @@ for idx, dish in enumerate(top_dishes):
             <b>{dish['Rating']}/5</b>
             </p>
 
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        </div>
+
+    </div>
+    """
+
+cards_html += "</div>"
+
+st.markdown(cards_html, unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -441,6 +479,44 @@ st.markdown("---")
 st.markdown("## Rate Food Item")
 
 vendors = list(meal_data.keys())
+
+preview_html = '<div class="mobile-scroll">'
+
+for vendor in vendors:
+
+    food = meal_data[vendor][0]
+
+    key = f"{selected_meal}|{vendor}|{food}"
+
+    votes = ratings_data[key]["votes"]
+
+    avg = (
+        ratings_data[key]["total_rating"] / votes
+        if votes > 0 else 0
+    )
+
+    preview_html += f"""
+
+    <div class="mobile-card">
+
+        <div class="food-card">
+
+            <h3>{food}</h3>
+
+            <p><b>Vendor:</b> {vendor}</p>
+
+            <p><b>Rating:</b> {round(avg,1)}/5</p>
+
+            <p><b>Total Orders:</b> {votes}</p>
+
+        </div>
+
+    </div>
+    """
+
+preview_html += "</div>"
+
+st.markdown(preview_html, unsafe_allow_html=True)
 
 tabs = st.tabs(vendors)
 
