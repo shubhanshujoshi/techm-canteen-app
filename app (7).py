@@ -1,13 +1,12 @@
 # =====================================================
 # TECH MAHINDRA SMART CANTEEN SYSTEM
-# MOBILE SWIPE VERSION (FINAL)
+# FINAL RESPONSIVE VERSION
 # =====================================================
 
 import streamlit as st
 from datetime import datetime
 import json
 import os
-import pandas as pd
 
 # =====================================================
 # PAGE CONFIG
@@ -32,6 +31,8 @@ html, body, [class*="css"] {
     font-family: 'Aptos', sans-serif;
 }
 
+/* MAIN APP */
+
 .stApp {
     background-color: #f5f5f5;
     color: #111111;
@@ -50,13 +51,6 @@ html, body, [class*="css"] {
     font-size: 16px;
 }
 
-/* SIDEBAR */
-
-section[data-testid="stSidebar"] {
-    background-color: white;
-    border-right: 1px solid #e5e5e5;
-}
-
 /* BUTTONS */
 
 .stButton > button {
@@ -71,29 +65,25 @@ section[data-testid="stSidebar"] {
 
 /* CARDS */
 
-.food-card,
-.top-card,
-.best-card,
-.admin-card {
+.card {
 
     background: white;
-    padding: 22px;
 
     border-radius: 18px;
+
+    padding: 22px;
 
     border-left: 6px solid #D9232D;
 
     box-shadow:
     0px 4px 14px rgba(0,0,0,0.08);
 
-    margin-bottom: 18px;
-
-    min-height: 260px;
+    min-height: 250px;
 }
 
-/* SWIPE CONTAINER */
+/* SWIPE SECTION */
 
-.swipe-container {
+.swipe-wrapper {
 
     display: flex;
 
@@ -106,15 +96,33 @@ section[data-testid="stSidebar"] {
     scroll-snap-type: x mandatory;
 }
 
-.swipe-container::-webkit-scrollbar {
-    display: none;
+.swipe-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.swipe-wrapper::-webkit-scrollbar-thumb {
+    background: #D9232D;
+    border-radius: 10px;
 }
 
 .swipe-card {
 
-    flex: 0 0 85%;
+    flex: 0 0 320px;
 
     scroll-snap-align: start;
+}
+
+/* MOBILE */
+
+@media screen and (max-width: 768px) {
+
+    .main-title {
+        font-size: 28px;
+    }
+
+    .swipe-card {
+        flex: 0 0 90%;
+    }
 }
 
 /* TABS */
@@ -133,8 +141,7 @@ section[data-testid="stSidebar"] {
 /* STARS */
 
 [data-testid="stFeedback"] button {
-    transform: scale(1.5);
-    margin-right: 10px;
+    transform: scale(1.4);
 }
 
 /* HIDE FOOTER */
@@ -149,19 +156,6 @@ footer {
 
 header {
     visibility: hidden;
-}
-
-/* MOBILE */
-
-@media screen and (max-width: 768px) {
-
-    .main-title {
-        font-size: 30px;
-    }
-
-    .swipe-card {
-        flex: 0 0 92%;
-    }
 }
 
 </style>
@@ -179,36 +173,12 @@ DATA_FILE = "ratings_data.json"
 
 default_data = {
 
-    "Breakfast": {
-        "Vendor A": ["Poha", "Upma", "Tea", "Coffee", "Sandwich"],
-        "Vendor B": ["Idli", "Dosa", "Coffee", "Vada", "Pongal"],
-        "Vendor C": ["Paratha", "Curd", "Tea", "Aloo Puri", "Lassi"],
-        "Vendor D": ["Bread Omelette", "Boiled Eggs", "Tea", "Maggi", "Milk"],
-        "Vendor E": ["Cornflakes", "Milk", "Banana Shake", "Oats", "Fruit Bowl"]
-    },
-
     "Lunch": {
-        "Vendor A": ["Dal Rice", "Paneer Butter Masala", "Roti", "Veg Pulao", "Salad"],
-        "Vendor B": ["Biryani", "Raita", "Cold Drink", "Chicken Curry", "Naan"],
-        "Vendor C": ["Rajma Chawal", "Salad", "Papad", "Mix Veg", "Jeera Rice"],
-        "Vendor D": ["Fried Rice", "Manchurian", "Noodles", "Spring Roll", "Soup"],
-        "Vendor E": ["Butter Chicken", "Jeera Rice", "Roti", "Dal Makhani", "Paneer Tikka"]
-    },
-
-    "Snacks": {
-        "Vendor A": ["Samosa", "Tea", "Coffee", "Burger", "French Fries"],
-        "Vendor B": ["Puff", "Cold Coffee", "Burger", "Pizza Slice", "Momos"],
-        "Vendor C": ["Momos", "Spring Roll", "Tea", "Sandwich", "Cold Drink"],
-        "Vendor D": ["French Fries", "Pizza Slice", "Pepsi", "Pasta", "Garlic Bread"],
-        "Vendor E": ["Pasta", "Garlic Bread", "Milkshake", "Brownie", "Nachos"]
-    },
-
-    "Dinner": {
-        "Vendor A": ["Dal Tadka", "Roti", "Rice", "Kheer", "Paneer Curry"],
-        "Vendor B": ["Kadhai Paneer", "Naan", "Lassi", "Butter Chicken", "Soup"],
-        "Vendor C": ["Khichdi", "Curd", "Pickle", "Veg Curry", "Rice"],
-        "Vendor D": ["Hakka Noodles", "Soup", "Manchurian", "Fried Rice", "Spring Roll"],
-        "Vendor E": ["Butter Chicken", "Rice", "Roti", "Dal Fry", "Ice Cream"]
+        "Vendor A": ["Dal Rice", "Paneer Butter Masala", "Roti"],
+        "Vendor B": ["Biryani", "Chicken Curry", "Naan"],
+        "Vendor C": ["Rajma Chawal", "Mix Veg", "Jeera Rice"],
+        "Vendor D": ["Fried Rice", "Noodles", "Soup"],
+        "Vendor E": ["Butter Chicken", "Dal Makhani", "Paneer Tikka"]
     }
 }
 
@@ -247,22 +217,19 @@ def load_data():
     if not os.path.exists(DATA_FILE):
 
         with open(DATA_FILE, "w") as f:
-            json.dump(fresh_data, f, indent=4)
+            json.dump(fresh_data, f)
 
         return fresh_data
 
-    try:
+    with open(DATA_FILE, "r") as f:
 
-        with open(DATA_FILE, "r") as f:
-            existing_data = json.load(f)
+        existing_data = json.load(f)
 
-        for key in existing_data:
+    for key in existing_data:
 
-            if key in fresh_data:
-                fresh_data[key].update(existing_data[key])
+        if key in fresh_data:
 
-    except:
-        fresh_data = initialize_ratings()
+            fresh_data[key].update(existing_data[key])
 
     return fresh_data
 
@@ -273,47 +240,9 @@ def load_data():
 def save_data(data):
 
     with open(DATA_FILE, "w") as f:
-        json.dump(data, f, indent=4)
+        json.dump(data, f)
 
 ratings_data = load_data()
-
-# =====================================================
-# CURRENT MEAL
-# =====================================================
-
-current_hour = datetime.now().hour
-
-def get_current_meal():
-
-    if 6 <= current_hour < 11:
-        return "Breakfast"
-
-    elif 11 <= current_hour < 16:
-        return "Lunch"
-
-    elif 16 <= current_hour < 19:
-        return "Snacks"
-
-    else:
-        return "Dinner"
-
-auto_meal = get_current_meal()
-
-# =====================================================
-# SIDEBAR
-# =====================================================
-
-st.sidebar.title("Admin Controls")
-
-show_admin = st.sidebar.button("Admin View")
-
-selected_meal = st.sidebar.selectbox(
-    "Select Meal Time",
-    ["Breakfast", "Lunch", "Snacks", "Dinner"],
-    index=["Breakfast", "Lunch", "Snacks", "Dinner"].index(auto_meal)
-)
-
-meal_data = default_data[selected_meal]
 
 # =====================================================
 # HEADER
@@ -336,11 +265,9 @@ with col2:
     )
 
     st.markdown(
-        f"""
+        """
         <div class="sub-title">
         Intelligent Food Experience & Feedback Platform
-        <br>
-        Currently Serving: <b>{selected_meal}</b>
         </div>
         """,
         unsafe_allow_html=True
@@ -348,8 +275,10 @@ with col2:
 
 st.markdown("---")
 
+meal_data = default_data["Lunch"]
+
 # =====================================================
-# TOP 5 DISHES (SWIPE MODE)
+# TOP 5 DISHES
 # =====================================================
 
 st.markdown("## Top 5 Highest Rated Dishes")
@@ -360,7 +289,7 @@ for vendor, foods in meal_data.items():
 
     for food in foods:
 
-        key = f"{selected_meal}|{vendor}|{food}"
+        key = f"Lunch|{vendor}|{food}"
 
         votes = ratings_data[key]["votes"]
 
@@ -381,7 +310,11 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-html = '<div class="swipe-container">'
+html = """
+
+<div class="swipe-wrapper">
+
+"""
 
 for idx, dish in enumerate(top_dishes):
 
@@ -391,7 +324,7 @@ for idx, dish in enumerate(top_dishes):
 
     <div class="swipe-card">
 
-        <div class="top-card">
+        <div class="card">
 
             <h2>{idx+1}. {dish['Food']}</h2>
 
@@ -406,11 +339,12 @@ for idx, dish in enumerate(top_dishes):
         </div>
 
     </div>
+
     """
 
 html += "</div>"
 
-st.components.v1.html(html, height=320, scrolling=True)
+st.markdown(html, unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -432,7 +366,7 @@ for tab, vendor in zip(tabs, meal_data.keys()):
             key=vendor
         )
 
-        key = f"{selected_meal}|{vendor}|{selected_food}"
+        key = f"Lunch|{vendor}|{selected_food}"
 
         votes = ratings_data[key]["votes"]
 
@@ -443,7 +377,7 @@ for tab, vendor in zip(tabs, meal_data.keys()):
 
         st.markdown(
             f"""
-            <div class="food-card">
+            <div class="card">
 
             <h2>{selected_food}</h2>
 
