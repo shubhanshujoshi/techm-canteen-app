@@ -1,6 +1,6 @@
 # =====================================================
 # TECH MAHINDRA SMART CANTEEN SYSTEM
-# FINAL RESPONSIVE SWIPE VERSION
+# FINAL ERROR-FREE VERSION
 # =====================================================
 
 import streamlit as st
@@ -14,7 +14,7 @@ import os
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
-    page_icon="logo.png",
+    page_icon="🍽️",
     layout="wide"
 )
 
@@ -25,29 +25,24 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-@import url('https://fonts.cdnfonts.com/css/aptos');
-
 html, body, [class*="css"] {
-    font-family: 'Aptos', sans-serif;
+    font-family: Arial, sans-serif;
 }
-
-/* MAIN APP */
 
 .stApp {
     background-color: #f5f5f5;
-    color: #111111;
 }
 
-/* HEADER */
+/* TITLE */
 
 .main-title {
     font-size: 42px;
-    font-weight: 700;
+    font-weight: bold;
     color: #D9232D;
 }
 
 .sub-title {
-    color: #555555;
+    color: #666;
     font-size: 16px;
 }
 
@@ -56,30 +51,10 @@ html, body, [class*="css"] {
 .stButton > button {
     background-color: #D9232D;
     color: white;
-    border-radius: 12px;
+    border-radius: 10px;
     border: none;
     padding: 12px;
-    font-weight: 600;
-    width: 100%;
-}
-
-/* TABS */
-
-.stTabs [data-baseweb="tab"] {
-    color: #D9232D;
-    font-weight: 600;
-}
-
-.stTabs [aria-selected="true"] {
-    background-color: #D9232D !important;
-    color: white !important;
-    border-radius: 10px;
-}
-
-/* STARS */
-
-[data-testid="stFeedback"] button {
-    transform: scale(1.4);
+    font-weight: bold;
 }
 
 /* HIDE STREAMLIT */
@@ -184,15 +159,18 @@ def load_data():
 
         return fresh_data
 
-    with open(DATA_FILE, "r") as f:
+    try:
 
-        existing_data = json.load(f)
+        with open(DATA_FILE, "r") as f:
+            existing_data = json.load(f)
 
-    for key in existing_data:
+        for key in existing_data:
 
-        if key in fresh_data:
+            if key in fresh_data:
+                fresh_data[key].update(existing_data[key])
 
-            fresh_data[key].update(existing_data[key])
+    except:
+        fresh_data = initialize_ratings()
 
     return fresh_data
 
@@ -218,15 +196,13 @@ def analyze_sentiment(feedbacks):
 
     positive_words = [
         "good", "great", "excellent",
-        "amazing", "awesome", "tasty",
-        "love", "nice", "best",
-        "fresh", "fantastic"
+        "amazing", "awesome", "love",
+        "tasty", "best", "fresh"
     ]
 
     negative_words = [
         "bad", "worst", "cold",
-        "stale", "awful", "poor",
-        "dirty", "disgusting"
+        "dirty", "poor", "awful"
     ]
 
     positive = 0
@@ -259,10 +235,10 @@ def analyze_sentiment(feedbacks):
 # HEADER
 # =====================================================
 
-col1, col2 = st.columns([1,7])
+col1, col2 = st.columns([1,6])
 
 with col1:
-    st.image("logo.png", width=80)
+    st.image("logo.png", width=90)
 
 with col2:
 
@@ -289,7 +265,7 @@ st.markdown("---")
 meal_data = default_data["Lunch"]
 
 # =====================================================
-# TOP 5 HIGHEST RATED DISHES
+# TOP 5 DISHES
 # =====================================================
 
 st.markdown("## Top 5 Highest Rated Dishes")
@@ -322,41 +298,30 @@ top_dishes = sorted(
 )[:5]
 
 # =====================================================
-# SWIPE HTML
+# HORIZONTAL CARDS
 # =====================================================
 
-swipe_html = """
-<div style="
-display:flex;
-overflow-x:auto;
-gap:20px;
-padding:10px;
-scroll-snap-type:x mandatory;
-">
-
-"""
+cols = st.columns(len(top_dishes))
 
 for idx, dish in enumerate(top_dishes):
 
     stars = "★" * int(round(dish["Rating"]))
 
-    swipe_html += f"""
+    with cols[idx]:
 
-    <div style="
-    min-width:300px;
-    background:white;
-    border-radius:18px;
-    padding:24px;
-    border-left:6px solid #D9232D;
-    box-shadow:0px 4px 14px rgba(0,0,0,0.08);
-    scroll-snap-align:start;
-    ">
+        st.markdown(f"""
+        <div style="
+        background:white;
+        padding:20px;
+        border-radius:18px;
+        border-left:6px solid #D9232D;
+        box-shadow:0px 4px 14px rgba(0,0,0,0.08);
+        min-height:240px;
+        ">
 
         <h2>{idx+1}. {dish['Food']}</h2>
 
-        <p>
-        <b>{dish['Vendor']}</b>
-        </p>
+        <p><b>{dish['Vendor']}</b></p>
 
         <p style="
         font-size:24px;
@@ -367,15 +332,8 @@ for idx, dish in enumerate(top_dishes):
 
         <h3>{dish['Rating']}/5</h3>
 
-    </div>
-    """
-
-swipe_html += "</div>"
-
-st.markdown(
-    swipe_html,
-    unsafe_allow_html=True
-)
+        </div>
+        """, unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -393,8 +351,7 @@ for tab, vendor in zip(tabs, meal_data.keys()):
 
         selected_food = st.selectbox(
             f"Select Food - {vendor}",
-            meal_data[vendor],
-            key=vendor
+            meal_data[vendor]
         )
 
         key = f"Lunch|{vendor}|{selected_food}"
@@ -406,28 +363,25 @@ for tab, vendor in zip(tabs, meal_data.keys()):
             if votes > 0 else 0
         )
 
-        st.markdown(
-            f"""
-            <div style="
-            background:white;
-            border-radius:18px;
-            padding:24px;
-            border-left:6px solid #D9232D;
-            box-shadow:0px 4px 14px rgba(0,0,0,0.08);
-            ">
+        st.markdown(f"""
+        <div style="
+        background:white;
+        padding:20px;
+        border-radius:18px;
+        border-left:6px solid #D9232D;
+        box-shadow:0px 4px 14px rgba(0,0,0,0.08);
+        ">
 
-            <h2>{selected_food}</h2>
+        <h2>{selected_food}</h2>
 
-            <p><b>Vendor:</b> {vendor}</p>
+        <p><b>Vendor:</b> {vendor}</p>
 
-            <p><b>Rating:</b> {round(avg,1)}/5</p>
+        <p><b>Rating:</b> {round(avg,1)}/5</p>
 
-            <p><b>Total Orders:</b> {votes}</p>
+        <p><b>Total Orders:</b> {votes}</p>
 
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        </div>
+        """, unsafe_allow_html=True)
 
         user_rating = st.feedback(
             "stars",
@@ -505,35 +459,33 @@ for vendor, foods in meal_data.items():
         all_feedbacks
     )
 
-cols = st.columns(5)
+admin_cols = st.columns(5)
 
 for idx, vendor in enumerate(vendor_orders):
 
-    with cols[idx]:
+    with admin_cols[idx]:
 
-        st.markdown(
-            f"""
-            <div style="
-            background:white;
-            border-radius:18px;
-            padding:22px;
-            border-left:6px solid #D9232D;
-            box-shadow:0px 4px 14px rgba(0,0,0,0.08);
-            ">
+        st.markdown(f"""
+        <div style="
+        background:white;
+        padding:20px;
+        border-radius:18px;
+        border-left:6px solid #D9232D;
+        box-shadow:0px 4px 14px rgba(0,0,0,0.08);
+        min-height:200px;
+        ">
 
-            <h3>{vendor}</h3>
+        <h3>{vendor}</h3>
 
-            <p>
-            <b>Total Orders:</b>
-            {vendor_orders[vendor]}
-            </p>
+        <p>
+        <b>Total Orders:</b>
+        {vendor_orders[vendor]}
+        </p>
 
-            <p>
-            <b>Sentiment:</b>
-            {sentiment_scores[vendor]}
-            </p>
+        <p>
+        <b>Sentiment:</b>
+        {sentiment_scores[vendor]}
+        </p>
 
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        </div>
+        """, unsafe_allow_html=True)
