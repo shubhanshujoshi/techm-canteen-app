@@ -49,13 +49,6 @@ html, body, [class*="css"] {
     font-size: 16px;
 }
 
-/* SIDEBAR */
-
-section[data-testid="stSidebar"] {
-    background-color: white;
-    border-right: 1px solid #e5e5e5;
-}
-
 /* BUTTONS */
 
 .stButton > button {
@@ -302,7 +295,7 @@ def analyze_sentiment(feedbacks):
 ratings_data = load_data()
 
 # ---------------------------------------------------
-# CURRENT MEAL
+# CURRENT MEAL LOGIC
 # ---------------------------------------------------
 
 current_hour = datetime.now().hour
@@ -320,38 +313,6 @@ def get_current_meal():
 auto_meal = get_current_meal()
 
 # ---------------------------------------------------
-# SIDEBAR CONTROLS
-# ---------------------------------------------------
-
-st.sidebar.title("Controls")
-
-# Use a toggle for Admin view so it stays open
-show_admin = st.sidebar.toggle("📊 Show Admin View")
-
-# Reset Button (Clears JSON and Session State Inputs)
-if st.sidebar.button("⚠️ Reset All Data & Inputs"):
-    ratings_data = initialize_ratings()
-    save_data(ratings_data)
-    
-    # Clear session state so UI inputs actually clear
-    for key in st.session_state.keys():
-        if key.startswith('feedback_') or key.startswith('text_') or key.endswith('_food'):
-            del st.session_state[key]
-            
-    st.sidebar.success("All data and inputs reset successfully!")
-    st.rerun()
-
-st.sidebar.markdown("---")
-
-selected_meal = st.sidebar.selectbox(
-    "Select Meal Time",
-    ["Breakfast", "Lunch", "Snacks", "Dinner"],
-    index=["Breakfast", "Lunch", "Snacks", "Dinner"].index(auto_meal)
-)
-
-meal_data = default_data[selected_meal]
-
-# ---------------------------------------------------
 # HEADER
 # ---------------------------------------------------
 
@@ -365,11 +326,9 @@ st.markdown(
 )
 
 st.markdown(
-    f"""
+    """
     <div class="sub-title">
     Intelligent Food Experience & Feedback Platform
-    <br>
-    Currently Serving: <b>{selected_meal}</b>
     </div>
     """,
     unsafe_allow_html=True
@@ -378,10 +337,47 @@ st.markdown(
 st.markdown("---")
 
 # ---------------------------------------------------
+# MAIN PAGE CONTROLS (Moved from Sidebar)
+# ---------------------------------------------------
+
+st.markdown("### ⚙️ Control Panel")
+
+ctrl_col1, ctrl_col2, ctrl_col3 = st.columns([1, 1, 1])
+
+with ctrl_col1:
+    selected_meal = st.selectbox(
+        "Select Meal Time",
+        ["Breakfast", "Lunch", "Snacks", "Dinner"],
+        index=["Breakfast", "Lunch", "Snacks", "Dinner"].index(auto_meal)
+    )
+
+with ctrl_col2:
+    st.markdown("<br>", unsafe_allow_html=True) # Adding spacing to align with selectbox
+    show_admin = st.toggle("📊 Show Admin Dashboard")
+
+with ctrl_col3:
+    st.markdown("<br>", unsafe_allow_html=True) # Adding spacing to align with selectbox
+    if st.button("⚠️ Reset All Data & Inputs"):
+        ratings_data = initialize_ratings()
+        save_data(ratings_data)
+        
+        # Clear session state so UI inputs actually clear
+        for key in st.session_state.keys():
+            if key.startswith('feedback_') or key.startswith('text_') or key.endswith('_food'):
+                del st.session_state[key]
+                
+        st.success("All data and inputs reset successfully!")
+        st.rerun()
+
+meal_data = default_data[selected_meal]
+
+st.markdown("---")
+
+# ---------------------------------------------------
 # TOP 5 HIGHEST RATED (HORIZONTAL SCROLL)
 # ---------------------------------------------------
 
-st.markdown("## Top 5 Highest Rated Dishes")
+st.markdown(f"## Top 5 Highest Rated Dishes ({selected_meal})")
 
 top_dishes = []
 for vendor, foods in meal_data.items():
@@ -519,7 +515,7 @@ st.markdown(best_scroll_html, unsafe_allow_html=True)
 
 if show_admin:
     st.markdown("---")
-    st.markdown("## Admin Dashboard")
+    st.markdown("## 📊 Admin Dashboard")
 
     vendor_orders = {}
     vendor_avg_ratings = {}
