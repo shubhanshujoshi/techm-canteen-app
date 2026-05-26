@@ -138,6 +138,11 @@ section[data-testid="stSidebar"] {
     border-radius: 10px;
 }
 
+/* METRICS */
+[data-testid="stMetricValue"] {
+    color: #D9232D;
+}
+
 /* FEEDBACK */
 
 [data-testid="stFeedback"] button {
@@ -323,11 +328,17 @@ st.sidebar.title("Controls")
 # Use a toggle for Admin view so it stays open
 show_admin = st.sidebar.toggle("📊 Show Admin View")
 
-# Reset Button
-if st.sidebar.button("⚠️ Reset All Ratings"):
+# Reset Button (Clears JSON and Session State Inputs)
+if st.sidebar.button("⚠️ Reset All Data & Inputs"):
     ratings_data = initialize_ratings()
     save_data(ratings_data)
-    st.sidebar.success("Ratings Reset Successfully!")
+    
+    # Clear session state so UI inputs actually clear
+    for key in st.session_state.keys():
+        if key.startswith('feedback_') or key.startswith('text_') or key.endswith('_food'):
+            del st.session_state[key]
+            
+    st.sidebar.success("All data and inputs reset successfully!")
     st.rerun()
 
 st.sidebar.markdown("---")
@@ -386,7 +397,6 @@ for vendor, foods in meal_data.items():
 
 top_dishes = sorted(top_dishes, key=lambda x: x["Rating"], reverse=True)[:5]
 
-# Using un-indented HTML strings to prevent Streamlit from reading it as a Markdown block
 scroll_html = '<div class="scroll-container">'
 for idx, dish in enumerate(top_dishes):
     stars = "★" * int(round(dish["Rating"]))
@@ -424,7 +434,6 @@ for tab, vendor in zip(tabs, vendors):
         votes = ratings_data[key]["votes"]
         avg = (ratings_data[key]["total_rating"] / votes) if votes > 0 else 0
         
-        # Calculate sentiment for selected food
         food_sentiment = analyze_sentiment(ratings_data[key].get("feedbacks", []))
 
         st.markdown(
@@ -453,12 +462,10 @@ for tab, vendor in zip(tabs, vendors):
 
         if st.button(f"Submit Rating - {selected_food}", key=f"btn_{key}"):
             if user_rating is not None:
-                # Streamlit star rating returns 0 to 4 (so we add 1 to get 1 to 5)
                 actual_rating = user_rating + 1
                 ratings_data[key]["total_rating"] += actual_rating
                 ratings_data[key]["votes"] += 1
                 
-                # Track 4 and 5 star ratings
                 if actual_rating >= 4:
                     ratings_data[key]["high_ratings"] += 1
 
@@ -496,7 +503,6 @@ for vendor in meal_data.keys():
             best_food = food
             best_rating = round(avg, 1)
             
-    # Using un-indented HTML string
     best_scroll_html += f"""<div class="scroll-card">
 <h4>{vendor}</h4>
 <p style="font-size:18px; font-weight: 600; color: #D9232D;">{best_food}</p>
@@ -518,7 +524,9 @@ if show_admin:
     vendor_orders = {}
     vendor_avg_ratings = {}
     vendor_satisfaction = {}
+    total_system_orders = 0
 
+    # Calculate Data
     for vendor, foods in meal_data.items():
         total_orders = 0
         total_rating_score = 0
@@ -532,18 +540,35 @@ if show_admin:
             total_rating_score += ratings_data[key]["total_rating"]
             total_high_ratings += ratings_data[key]["high_ratings"]
 
-        # Calculate Average Rating
         avg_rating = (total_rating_score / total_orders) if total_orders > 0 else 0
         vendor_avg_ratings[vendor] = round(avg_rating, 2)
         
-        # Calculate Customer Satisfaction % (4 and 5 stars)
         satisfaction = (total_high_ratings / total_orders * 100) if total_orders > 0 else 0
         vendor_satisfaction[vendor] = round(satisfaction, 1)
         
         vendor_orders[vendor] = total_orders
+        total_system_orders += total_orders
 
-    st.markdown("### Vendor Performance Metrics")
+    # Mock calculations for wastage metrics based on orders (can be replaced with real backend logic later)
+    # Assumes base stock of 50 per vendor over actual orders, and preventative measures saving 15%
+    simulated_wastage_kg = max(0, ((len(vendors) * 50) - total_system_orders) * 0.2) 
+    simulated_prevented_kg = total_system_orders * 0.15 
 
+    # Top Level Metrics
+    m1, m2, m3 = st.columns(3)
+    m1.metric(label="Total Orders Received", value=total_system_orders)
+    m2.metric(label="Total Food Wastage (This Month)", value=f"{simulated_wastage_kg:.1f} kg", delta="-5% vs Last Month", delta_color="inverse")
+    m3.metric(label="Food Wastage Prevented (This Month)", value=f"{simulated_prevented_kg:.1f} kg", delta="+12% Efficiency")
+
+    st.markdown("---")
+
+    st.markdown("### Total Orders Served by Vendor (Line Chart)")
+    chart_data = pd.DataFrame({
+        "Orders Served": list(vendor_orders.values())
+    }, index=list(vendor_orders.keys()))
+    st.line_chart(chart_data, color="#D9232D")
+
+    st.markdown("### Vendor Performance Breakdown")
     admin_cols = st.columns(len(vendor_orders))
     for idx, vendor in enumerate(vendor_orders):
         with admin_cols[idx]:
@@ -558,15 +583,6 @@ if show_admin:
                 """,
                 unsafe_allow_html=True
             )
-
-    st.markdown("### Total Orders Served (Line Chart)")
-
-    # Prepare DataFrame for the Line Chart
-    chart_data = pd.DataFrame({
-        "Orders Served": list(vendor_orders.values())
-    }, index=list(vendor_orders.keys()))
-
-    st.line_chart(chart_data, color="#D9232D")
 
 # ---------------------------------------------------
 # FOOTER
