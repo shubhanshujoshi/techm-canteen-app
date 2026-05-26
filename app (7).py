@@ -315,17 +315,19 @@ def get_current_meal():
 auto_meal = get_current_meal()
 
 # ---------------------------------------------------
-# SIDEBAR
+# SIDEBAR CONTROLS
 # ---------------------------------------------------
 
 st.sidebar.title("Controls")
 
-show_admin = st.sidebar.button("Admin View")
+# Use a toggle for Admin view so it stays open
+show_admin = st.sidebar.toggle("📊 Show Admin View")
 
-if st.sidebar.button("Reset All Ratings"):
+# Reset Button
+if st.sidebar.button("⚠️ Reset All Ratings"):
     ratings_data = initialize_ratings()
     save_data(ratings_data)
-    st.sidebar.success("Ratings Reset Successfully")
+    st.sidebar.success("Ratings Reset Successfully!")
     st.rerun()
 
 st.sidebar.markdown("---")
@@ -384,18 +386,16 @@ for vendor, foods in meal_data.items():
 
 top_dishes = sorted(top_dishes, key=lambda x: x["Rating"], reverse=True)[:5]
 
-# Build HTML for horizontal scrolling
+# Using un-indented HTML strings to prevent Streamlit from reading it as a Markdown block
 scroll_html = '<div class="scroll-container">'
 for idx, dish in enumerate(top_dishes):
     stars = "★" * int(round(dish["Rating"]))
-    scroll_html += f"""
-        <div class="scroll-card">
-            <h3>{idx+1}. {dish['Food']}</h3>
-            <p><b>{dish['Vendor']}</b></p>
-            <p style="font-size:22px; color:#D9232D; margin: 0;">{stars}</p>
-            <p style="margin-top: 5px;"><b>{dish['Rating']} / 5</b></p>
-        </div>
-    """
+    scroll_html += f"""<div class="scroll-card">
+<h3>{idx+1}. {dish['Food']}</h3>
+<p><b>{dish['Vendor']}</b></p>
+<p style="font-size:22px; color:#D9232D; margin: 0;">{stars}</p>
+<p style="margin-top: 5px;"><b>{dish['Rating']} / 5</b></p>
+</div>"""
 scroll_html += '</div>'
 
 st.markdown(scroll_html, unsafe_allow_html=True)
@@ -481,7 +481,6 @@ st.markdown("---")
 st.markdown("## Best Selling Dish Of Each Vendor")
 
 best_scroll_html = '<div class="scroll-container">'
-
 for vendor in meal_data.keys():
     best_food = None
     best_votes = -1
@@ -497,14 +496,13 @@ for vendor in meal_data.keys():
             best_food = food
             best_rating = round(avg, 1)
             
-    best_scroll_html += f"""
-        <div class="scroll-card">
-            <h4>{vendor}</h4>
-            <p style="font-size:18px; font-weight: 600; color: #D9232D;">{best_food}</p>
-            <p>Rating: <b>{best_rating} / 5</b></p>
-            <p>Total Orders: <b>{best_votes}</b></p>
-        </div>
-    """
+    # Using un-indented HTML string
+    best_scroll_html += f"""<div class="scroll-card">
+<h4>{vendor}</h4>
+<p style="font-size:18px; font-weight: 600; color: #D9232D;">{best_food}</p>
+<p>Rating: <b>{best_rating} / 5</b></p>
+<p>Total Orders: <b>{best_votes}</b></p>
+</div>"""
 best_scroll_html += '</div>'
 
 st.markdown(best_scroll_html, unsafe_allow_html=True)
