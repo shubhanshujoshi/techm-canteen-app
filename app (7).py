@@ -14,7 +14,7 @@ import pandas as pd
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
-    page_icon="🍽️",
+    page_icon="logo.png",
     layout="wide"
 )
 
