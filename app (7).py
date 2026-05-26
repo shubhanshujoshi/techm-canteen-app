@@ -14,9 +14,8 @@ import pandas as pd
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
-    page_icon="logo.png",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    page_icon="🍽️",
+    layout="wide"
 )
 
 # ---------------------------------------------------
@@ -29,10 +28,8 @@ st.markdown("""
 @import url('https://fonts.cdnfonts.com/css/aptos');
 
 html, body, [class*="css"] {
-    font-family: 'Aptos', sans-serif;
+    font-family: 'Aptos', sans-serif !important;
 }
-
-/* APP */
 
 .stApp {
     background-color: #f5f5f5;
@@ -52,20 +49,6 @@ html, body, [class*="css"] {
     font-size: 16px;
 }
 
-/* MOBILE */
-
-@media (max-width: 768px) {
-
-    .main-title {
-        font-size: 28px !important;
-    }
-
-    .sub-title {
-        font-size: 14px !important;
-    }
-
-}
-
 /* SIDEBAR */
 
 section[data-testid="stSidebar"] {
@@ -77,7 +60,7 @@ section[data-testid="stSidebar"] {
 
 .stButton > button {
     background-color: #D9232D;
-    color: white !important;
+    color: white;
     border-radius: 12px;
     border: none;
     padding: 12px;
@@ -92,62 +75,54 @@ section[data-testid="stSidebar"] {
 
 /* CARDS */
 
-.food-card,
-.top-card,
-.best-card,
-.admin-card {
-
+.food-card, .admin-card {
     background: white;
-
-    padding: 22px;
-
+    padding: 24px;
     border-radius: 18px;
-
+    margin-bottom: 18px;
     border-left: 6px solid #D9232D;
-
-    box-shadow:
-    0px 4px 14px rgba(0,0,0,0.08);
+    box-shadow: 0px 4px 14px rgba(0,0,0,0.08);
 }
 
-/* SWIPE CONTAINER */
+/* HORIZONTAL SCROLL CONTAINER (SWIPE LEFT FEATURE) */
 
-.swipe-container {
-
+.scroll-container {
     display: flex;
-
     overflow-x: auto;
-    overflow-y: hidden;
-
-    gap: 18px;
-
-    padding-bottom: 12px;
-
-    scroll-behavior: smooth;
-
+    gap: 20px;
+    padding: 10px 5px 20px 5px;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #D9232D #f0f0f0;
 }
 
-/* HIDE SCROLLBAR */
-
-.swipe-container::-webkit-scrollbar {
-    display: none;
+.scroll-container::-webkit-scrollbar {
+    height: 8px;
 }
 
-/* SWIPE CARDS */
-
-.swipe-card {
-
-    min-width: 260px;
-    max-width: 260px;
-
-    flex-shrink: 0;
+.scroll-container::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 10px;
 }
 
-/* FEEDBACK */
+.scroll-container::-webkit-scrollbar-thumb {
+    background-color: #D9232D;
+    border-radius: 10px;
+}
 
-[data-testid="stFeedback"] button {
-    transform: scale(1.4);
-    margin-right: 10px;
+.scroll-card {
+    min-width: 280px;
+    flex: 0 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 18px;
+    border-left: 6px solid #D9232D;
+    box-shadow: 0px 4px 14px rgba(0,0,0,0.08);
+}
+
+.scroll-card h3, .scroll-card h4 {
+    margin-top: 0;
+    color: #111;
 }
 
 /* TABS */
@@ -161,6 +136,13 @@ section[data-testid="stSidebar"] {
     background-color: #D9232D !important;
     color: white !important;
     border-radius: 10px;
+}
+
+/* FEEDBACK */
+
+[data-testid="stFeedback"] button {
+    transform: scale(1.5);
+    margin-right: 10px;
 }
 
 /* FOOTER */
@@ -191,7 +173,6 @@ DATA_FILE = "ratings_data.json"
 # ---------------------------------------------------
 
 default_data = {
-
     "Breakfast": {
         "Vendor A": ["Poha", "Upma", "Tea", "Coffee", "Sandwich"],
         "Vendor B": ["Idli", "Dosa", "Coffee", "Vada", "Pongal"],
@@ -199,7 +180,6 @@ default_data = {
         "Vendor D": ["Bread Omelette", "Boiled Eggs", "Tea", "Maggi", "Milk"],
         "Vendor E": ["Cornflakes", "Milk", "Banana Shake", "Oats", "Fruit Bowl"]
     },
-
     "Lunch": {
         "Vendor A": ["Dal Rice", "Paneer Butter Masala", "Roti", "Veg Pulao", "Salad"],
         "Vendor B": ["Biryani", "Raita", "Cold Drink", "Chicken Curry", "Naan"],
@@ -207,7 +187,6 @@ default_data = {
         "Vendor D": ["Fried Rice", "Manchurian", "Noodles", "Spring Roll", "Soup"],
         "Vendor E": ["Butter Chicken", "Jeera Rice", "Roti", "Dal Makhani", "Paneer Tikka"]
     },
-
     "Snacks": {
         "Vendor A": ["Samosa", "Tea", "Coffee", "Burger", "French Fries"],
         "Vendor B": ["Puff", "Cold Coffee", "Burger", "Pizza Slice", "Momos"],
@@ -215,7 +194,6 @@ default_data = {
         "Vendor D": ["French Fries", "Pizza Slice", "Pepsi", "Pasta", "Garlic Bread"],
         "Vendor E": ["Pasta", "Garlic Bread", "Milkshake", "Brownie", "Nachos"]
     },
-
     "Dinner": {
         "Vendor A": ["Dal Tadka", "Roti", "Rice", "Kheer", "Paneer Curry"],
         "Vendor B": ["Kadhai Paneer", "Naan", "Lassi", "Butter Chicken", "Soup"],
@@ -230,24 +208,17 @@ default_data = {
 # ---------------------------------------------------
 
 def initialize_ratings():
-
     ratings = {}
-
     for meal, vendors in default_data.items():
-
         for vendor, foods in vendors.items():
-
             for food in foods:
-
                 key = f"{meal}|{vendor}|{food}"
-
                 ratings[key] = {
                     "total_rating": 0,
                     "votes": 0,
-                    "feedbacks": [],
-                    "positive_votes": 0
+                    "high_ratings": 0, # Tracks 4 and 5 star ratings
+                    "feedbacks": []
                 }
-
     return ratings
 
 # ---------------------------------------------------
@@ -255,29 +226,25 @@ def initialize_ratings():
 # ---------------------------------------------------
 
 def load_data():
-
     fresh_data = initialize_ratings()
-
     if not os.path.exists(DATA_FILE):
-
         with open(DATA_FILE, "w") as f:
             json.dump(fresh_data, f, indent=4)
-
         return fresh_data
 
     try:
-
         with open(DATA_FILE, "r") as f:
             existing_data = json.load(f)
 
         for key in existing_data:
-
             if key in fresh_data:
                 fresh_data[key].update(existing_data[key])
-
+                if "feedbacks" not in fresh_data[key]:
+                    fresh_data[key]["feedbacks"] = []
+                if "high_ratings" not in fresh_data[key]:
+                    fresh_data[key]["high_ratings"] = 0
     except:
         fresh_data = initialize_ratings()
-
     return fresh_data
 
 # ---------------------------------------------------
@@ -285,7 +252,6 @@ def load_data():
 # ---------------------------------------------------
 
 def save_data(data):
-
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
@@ -294,9 +260,8 @@ def save_data(data):
 # ---------------------------------------------------
 
 def analyze_sentiment(feedbacks):
-
     if not feedbacks:
-        return "Neutral"
+        return "🟡 Neutral"
 
     positive_words = [
         "good", "great", "excellent", "amazing",
@@ -314,31 +279,20 @@ def analyze_sentiment(feedbacks):
     negative_count = 0
 
     for feedback in feedbacks:
-
         feedback = feedback.lower()
-
         for word in positive_words:
-
             if word in feedback:
                 positive_count += 1
-
         for word in negative_words:
-
             if word in feedback:
                 negative_count += 1
 
     if positive_count > negative_count:
-        return "Positive"
-
+        return "🟢 Positive"
     elif negative_count > positive_count:
-        return "Negative"
-
+        return "🔴 Negative"
     else:
-        return "Neutral"
-
-# ---------------------------------------------------
-# LOAD RATINGS
-# ---------------------------------------------------
+        return "🟡 Neutral"
 
 ratings_data = load_data()
 
@@ -349,16 +303,12 @@ ratings_data = load_data()
 current_hour = datetime.now().hour
 
 def get_current_meal():
-
     if 6 <= current_hour < 11:
         return "Breakfast"
-
     elif 11 <= current_hour < 16:
         return "Lunch"
-
     elif 16 <= current_hour < 19:
         return "Snacks"
-
     else:
         return "Dinner"
 
@@ -368,19 +318,17 @@ auto_meal = get_current_meal()
 # SIDEBAR
 # ---------------------------------------------------
 
-st.sidebar.title("Admin Controls")
+st.sidebar.title("Controls")
 
 show_admin = st.sidebar.button("Admin View")
 
 if st.sidebar.button("Reset All Ratings"):
-
     ratings_data = initialize_ratings()
-
     save_data(ratings_data)
-
-    st.sidebar.success("All ratings reset successfully")
-
+    st.sidebar.success("Ratings Reset Successfully")
     st.rerun()
+
+st.sidebar.markdown("---")
 
 selected_meal = st.sidebar.selectbox(
     "Select Meal Time",
@@ -394,114 +342,78 @@ meal_data = default_data[selected_meal]
 # HEADER
 # ---------------------------------------------------
 
-col1, col2 = st.columns([1,7])
+st.markdown(
+    """
+    <div class="main-title">
+    Tech Mahindra Smart Canteen
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-with col1:
-    st.image("logo.png", width=90)
-
-with col2:
-
-    st.markdown(
-        f"""
-        <div class="main-title">
-        Tech Mahindra Smart Canteen
-        </div>
-
-        <div class="sub-title">
-        Intelligent Food Experience & Feedback Platform
-        <br>
-        Currently Serving: <b>{selected_meal}</b>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+st.markdown(
+    f"""
+    <div class="sub-title">
+    Intelligent Food Experience & Feedback Platform
+    <br>
+    Currently Serving: <b>{selected_meal}</b>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 st.markdown("---")
 
 # ---------------------------------------------------
-# TOP RATED DISHES
+# TOP 5 HIGHEST RATED (HORIZONTAL SCROLL)
 # ---------------------------------------------------
 
 st.markdown("## Top 5 Highest Rated Dishes")
 
 top_dishes = []
-
 for vendor, foods in meal_data.items():
-
     for food in foods:
-
         key = f"{selected_meal}|{vendor}|{food}"
-
         votes = ratings_data[key]["votes"]
-
-        avg_rating = (
-            ratings_data[key]["total_rating"] / votes
-            if votes > 0 else 0
-        )
-
+        avg = (ratings_data[key]["total_rating"] / votes) if votes > 0 else 0
         top_dishes.append({
             "Food": food,
             "Vendor": vendor,
-            "Rating": round(avg_rating, 1)
+            "Rating": round(avg, 1)
         })
 
-top_dishes = sorted(
-    top_dishes,
-    key=lambda x: x["Rating"],
-    reverse=True
-)[:5]
+top_dishes = sorted(top_dishes, key=lambda x: x["Rating"], reverse=True)[:5]
 
-top_html = """
-<div class="swipe-container">
-"""
-
+# Build HTML for horizontal scrolling
+scroll_html = '<div class="scroll-container">'
 for idx, dish in enumerate(top_dishes):
-
     stars = "★" * int(round(dish["Rating"]))
-
-    top_html += f"""
-
-    <div class="swipe-card">
-
-        <div class="top-card">
-
+    scroll_html += f"""
+        <div class="scroll-card">
             <h3>{idx+1}. {dish['Food']}</h3>
-
             <p><b>{dish['Vendor']}</b></p>
-
-            <p style="font-size:22px; color:#D9232D;">
-            {stars}
-            </p>
-
-            <p><b>{dish['Rating']}/5</b></p>
-
+            <p style="font-size:22px; color:#D9232D; margin: 0;">{stars}</p>
+            <p style="margin-top: 5px;"><b>{dish['Rating']} / 5</b></p>
         </div>
-
-    </div>
     """
+scroll_html += '</div>'
 
-top_html += "</div>"
-
-st.components.v1.html(top_html, height=260)
+st.markdown(scroll_html, unsafe_allow_html=True)
 
 st.markdown("---")
 
 # ---------------------------------------------------
-# RATE FOOD
+# RATE FOOD SECTION
 # ---------------------------------------------------
 
 st.markdown("## Rate Food Item")
 
 vendors = list(meal_data.keys())
-
 tabs = st.tabs(vendors)
 
 for tab, vendor in zip(tabs, vendors):
-
     with tab:
-
         foods = meal_data[vendor]
-
         selected_food = st.selectbox(
             f"Select Food - {vendor}",
             foods,
@@ -509,32 +421,20 @@ for tab, vendor in zip(tabs, vendors):
         )
 
         key = f"{selected_meal}|{vendor}|{selected_food}"
-
         votes = ratings_data[key]["votes"]
-
-        avg_rating = (
-            ratings_data[key]["total_rating"] / votes
-            if votes > 0 else 0
-        )
-
-        sentiment = analyze_sentiment(
-            ratings_data[key]["feedbacks"]
-        )
+        avg = (ratings_data[key]["total_rating"] / votes) if votes > 0 else 0
+        
+        # Calculate sentiment for selected food
+        food_sentiment = analyze_sentiment(ratings_data[key].get("feedbacks", []))
 
         st.markdown(
             f"""
             <div class="food-card">
-
-                <h3>{selected_food}</h3>
-
-                <p><b>Vendor:</b> {vendor}</p>
-
-                <p><b>Rating:</b> {round(avg_rating,1)}/5</p>
-
-                <p><b>Total Orders:</b> {votes}</p>
-
-                <p><b>Sentiment:</b> {sentiment}</p>
-
+            <h3>{selected_food}</h3>
+            <p><b>Vendor:</b> {vendor}</p>
+            <p><b>Current Rating:</b> {round(avg,1)} / 5</p>
+            <p><b>Total Orders:</b> {votes}</p>
+            <p><b>Customer Sentiment:</b> {food_sentiment}</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -545,185 +445,134 @@ for tab, vendor in zip(tabs, vendors):
             key=f"feedback_{key}"
         )
 
-        user_feedback = st.text_area(
+        user_text = st.text_area(
             "Optional Feedback",
             placeholder="Write your feedback here...",
             key=f"text_{key}"
         )
 
-        if st.button(
-            f"Submit Rating - {selected_food}",
-            key=f"btn_{key}"
-        ):
-
+        if st.button(f"Submit Rating - {selected_food}", key=f"btn_{key}"):
             if user_rating is not None:
-
-                ratings_data[key]["total_rating"] += (
-                    user_rating + 1
-                )
-
+                # Streamlit star rating returns 0 to 4 (so we add 1 to get 1 to 5)
+                actual_rating = user_rating + 1
+                ratings_data[key]["total_rating"] += actual_rating
                 ratings_data[key]["votes"] += 1
+                
+                # Track 4 and 5 star ratings
+                if actual_rating >= 4:
+                    ratings_data[key]["high_ratings"] += 1
 
-                if user_rating >= 3:
-                    ratings_data[key]["positive_votes"] += 1
-
-                if user_feedback.strip() != "":
-
-                    ratings_data[key]["feedbacks"].append(
-                        user_feedback
-                    )
+                if user_text.strip() != "":
+                    ratings_data[key]["feedbacks"].append(user_text)
 
                 save_data(ratings_data)
-
-                st.success("Feedback Submitted Successfully")
-
+                st.success("Feedback Submitted Successfully ✅")
+                st.balloons()
                 st.rerun()
-
             else:
-
-                st.warning("Please select star rating.")
+                st.warning("Please select a star rating.")
 
 st.markdown("---")
 
 # ---------------------------------------------------
-# BEST SELLING ITEMS
+# BEST SELLING DISHES (HORIZONTAL SCROLL)
 # ---------------------------------------------------
 
 st.markdown("## Best Selling Dish Of Each Vendor")
 
-best_html = """
-<div class="swipe-container">
-"""
+best_scroll_html = '<div class="scroll-container">'
 
 for vendor in meal_data.keys():
-
     best_food = None
     best_votes = -1
     best_rating = 0
 
     for food in meal_data[vendor]:
-
         key = f"{selected_meal}|{vendor}|{food}"
-
         votes = ratings_data[key]["votes"]
-
-        avg_rating = (
-            ratings_data[key]["total_rating"] / votes
-            if votes > 0 else 0
-        )
+        avg = (ratings_data[key]["total_rating"] / votes) if votes > 0 else 0
 
         if votes > best_votes:
-
             best_votes = votes
             best_food = food
-            best_rating = round(avg_rating,1)
-
-    best_html += f"""
-
-    <div class="swipe-card">
-
-        <div class="best-card">
-
+            best_rating = round(avg, 1)
+            
+    best_scroll_html += f"""
+        <div class="scroll-card">
             <h4>{vendor}</h4>
-
-            <p><b>{best_food}</b></p>
-
-            <p>Rating: {best_rating}/5</p>
-
-            <p>Orders: {best_votes}</p>
-
+            <p style="font-size:18px; font-weight: 600; color: #D9232D;">{best_food}</p>
+            <p>Rating: <b>{best_rating} / 5</b></p>
+            <p>Total Orders: <b>{best_votes}</b></p>
         </div>
-
-    </div>
     """
+best_scroll_html += '</div>'
 
-best_html += "</div>"
-
-st.components.v1.html(best_html, height=240)
+st.markdown(best_scroll_html, unsafe_allow_html=True)
 
 # ---------------------------------------------------
 # ADMIN DASHBOARD
 # ---------------------------------------------------
 
 if show_admin:
-
     st.markdown("---")
-
     st.markdown("## Admin Dashboard")
 
-    vendor_ratings = {}
-    vendor_satisfaction = {}
     vendor_orders = {}
+    vendor_avg_ratings = {}
+    vendor_satisfaction = {}
 
     for vendor, foods in meal_data.items():
-
-        total_rating = 0
-        total_votes = 0
-        positive_votes = 0
+        total_orders = 0
+        total_rating_score = 0
+        total_high_ratings = 0
 
         for food in foods:
-
             key = f"{selected_meal}|{vendor}|{food}"
+            votes = ratings_data[key]["votes"]
+            
+            total_orders += votes
+            total_rating_score += ratings_data[key]["total_rating"]
+            total_high_ratings += ratings_data[key]["high_ratings"]
 
-            total_rating += ratings_data[key]["total_rating"]
+        # Calculate Average Rating
+        avg_rating = (total_rating_score / total_orders) if total_orders > 0 else 0
+        vendor_avg_ratings[vendor] = round(avg_rating, 2)
+        
+        # Calculate Customer Satisfaction % (4 and 5 stars)
+        satisfaction = (total_high_ratings / total_orders * 100) if total_orders > 0 else 0
+        vendor_satisfaction[vendor] = round(satisfaction, 1)
+        
+        vendor_orders[vendor] = total_orders
 
-            total_votes += ratings_data[key]["votes"]
+    st.markdown("### Vendor Performance Metrics")
 
-            positive_votes += ratings_data[key]["positive_votes"]
-
-        average_rating = (
-            round(total_rating / total_votes, 1)
-            if total_votes > 0 else 0
-        )
-
-        satisfaction = (
-            round((positive_votes / total_votes) * 100, 1)
-            if total_votes > 0 else 0
-        )
-
-        vendor_ratings[vendor] = average_rating
-        vendor_satisfaction[vendor] = satisfaction
-        vendor_orders[vendor] = total_votes
-
-    st.markdown("### Vendor Performance")
-
-    admin_cols = st.columns(len(vendor_ratings))
-
-    for idx, vendor in enumerate(vendor_ratings):
-
+    admin_cols = st.columns(len(vendor_orders))
+    for idx, vendor in enumerate(vendor_orders):
         with admin_cols[idx]:
-
             st.markdown(
                 f"""
                 <div class="admin-card">
-
                     <h4>{vendor}</h4>
-
-                    <p><b>Average Rating:</b> {vendor_ratings[vendor]}/5</p>
-
-                    <p><b>Customer Satisfaction:</b> {vendor_satisfaction[vendor]}%</p>
-
+                    <p><b>Avg Rating:</b> {vendor_avg_ratings[vendor]} / 5</p>
+                    <p><b>Satisfaction:</b> {vendor_satisfaction[vendor]}%</p>
                     <p><b>Total Orders:</b> {vendor_orders[vendor]}</p>
-
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
-    st.markdown("### Orders Served By Vendors")
+    st.markdown("### Total Orders Served (Line Chart)")
 
+    # Prepare DataFrame for the Line Chart
     chart_data = pd.DataFrame({
         "Orders Served": list(vendor_orders.values())
     }, index=list(vendor_orders.keys()))
 
-    st.line_chart(chart_data)
+    st.line_chart(chart_data, color="#D9232D")
 
 # ---------------------------------------------------
 # FOOTER
 # ---------------------------------------------------
 
 st.markdown("---")
-
-st.caption(
-    "Built for Tech Mahindra Smart Canteen Management System"
-)
+st.caption("Built for Tech Mahindra Smart Canteen Management System")
