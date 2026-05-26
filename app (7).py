@@ -14,7 +14,7 @@ import pandas as pd
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
-    page_icon="🍽️",
+    page_icon="logo.png",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -39,7 +39,7 @@ html, body, [class*="css"] {
     color: #111111;
 }
 
-/* MOBILE TEXT FIX */
+/* MOBILE FIX */
 
 @media (max-width: 768px) {
 
@@ -53,6 +53,10 @@ html, body, [class*="css"] {
 
     .sub-title {
         font-size: 14px !important;
+    }
+
+    .food-card {
+        min-width: 100% !important;
     }
 }
 
@@ -104,38 +108,45 @@ section[data-testid="stSidebar"] {
     padding: 20px;
     border-radius: 18px;
 
-    min-width: 250px;
-    max-width: 250px;
-
     border-left: 6px solid #D9232D;
 
     box-shadow:
     0px 4px 14px rgba(0,0,0,0.08);
-
-    flex-shrink: 0;
 }
 
-/* HORIZONTAL SCROLL SECTION */
+/* HORIZONTAL SWIPE */
 
 .horizontal-scroll {
 
     display: flex;
+
     overflow-x: auto;
+    overflow-y: hidden;
+
     gap: 16px;
 
-    padding-bottom: 10px;
-    padding-top: 10px;
+    padding: 10px 5px;
 
     scroll-behavior: smooth;
+
+    -webkit-overflow-scrolling: touch;
 }
+
+/* HIDE SCROLLBAR */
 
 .horizontal-scroll::-webkit-scrollbar {
-    height: 8px;
+    display: none;
 }
 
-.horizontal-scroll::-webkit-scrollbar-thumb {
-    background: #D9232D;
-    border-radius: 10px;
+/* SWIPE CARDS */
+
+.top-card,
+.best-card {
+
+    min-width: 250px;
+    max-width: 250px;
+
+    flex-shrink: 0;
 }
 
 /* TABS */
@@ -287,6 +298,53 @@ def save_data(data):
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
+# ---------------------------------------------------
+# SENTIMENT ANALYSIS
+# ---------------------------------------------------
+
+def analyze_sentiment(feedbacks):
+
+    if not feedbacks:
+        return "Neutral"
+
+    positive_words = [
+        "good", "great", "excellent", "amazing",
+        "awesome", "tasty", "love", "nice",
+        "best", "fresh", "fantastic", "delicious"
+    ]
+
+    negative_words = [
+        "bad", "worst", "cold", "stale",
+        "awful", "hate", "poor", "dirty",
+        "disgusting", "late", "waste"
+    ]
+
+    positive_count = 0
+    negative_count = 0
+
+    for feedback in feedbacks:
+
+        feedback = feedback.lower()
+
+        for word in positive_words:
+
+            if word in feedback:
+                positive_count += 1
+
+        for word in negative_words:
+
+            if word in feedback:
+                negative_count += 1
+
+    if positive_count > negative_count:
+        return "Positive"
+
+    elif negative_count > positive_count:
+        return "Negative"
+
+    else:
+        return "Neutral"
+
 ratings_data = load_data()
 
 # ---------------------------------------------------
@@ -315,7 +373,7 @@ auto_meal = get_current_meal()
 # SIDEBAR
 # ---------------------------------------------------
 
-st.sidebar.markdown("## Admin Controls")
+st.sidebar.title("Admin Controls")
 
 show_admin = st.sidebar.toggle("Show Admin Dashboard")
 
@@ -344,7 +402,7 @@ meal_data = default_data[selected_meal]
 col1, col2 = st.columns([1,7])
 
 with col1:
-    st.markdown("## 🍽️")
+    st.image("logo.png", width=90)
 
 with col2:
 
@@ -369,7 +427,7 @@ st.markdown("---")
 # TOP 5 HIGHEST RATED
 # ---------------------------------------------------
 
-st.markdown("## ⭐ Top 5 Highest Rated Dishes")
+st.markdown("## Top 5 Highest Rated Dishes")
 
 top_dishes = []
 
@@ -398,7 +456,9 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-cards_html = '<div class="horizontal-scroll">'
+cards_html = """
+<div class="horizontal-scroll">
+"""
 
 for idx, dish in enumerate(top_dishes):
 
@@ -413,15 +473,20 @@ for idx, dish in enumerate(top_dishes):
         <p><b>{dish['Vendor']}</b></p>
 
         <p style="font-size:22px; color:#D9232D;">
-        {stars}
+            {stars}
         </p>
 
-        <p><b>{dish['Rating']}/5</b></p>
+        <p>
+            <b>{dish['Rating']}/5</b>
+        </p>
 
     </div>
+
     """
 
-cards_html += "</div>"
+cards_html += """
+</div>
+"""
 
 st.markdown(cards_html, unsafe_allow_html=True)
 
@@ -431,7 +496,7 @@ st.markdown("---")
 # RATE FOOD SECTION
 # ---------------------------------------------------
 
-st.markdown("## 🍛 Rate Food Item")
+st.markdown("## Rate Food Item")
 
 vendors = list(meal_data.keys())
 
@@ -507,9 +572,7 @@ for tab, vendor in zip(tabs, vendors):
 
                 save_data(ratings_data)
 
-                st.success("Feedback Submitted Successfully ✅")
-
-                st.balloons()
+                st.success("Feedback Submitted Successfully")
 
                 st.rerun()
 
@@ -523,9 +586,11 @@ st.markdown("---")
 # BEST SELLING DISHES
 # ---------------------------------------------------
 
-st.markdown("## 🔥 Best Selling Dish Of Each Vendor")
+st.markdown("## Best Selling Dish Of Each Vendor")
 
-best_html = '<div class="horizontal-scroll">'
+best_html = """
+<div class="horizontal-scroll">
+"""
 
 for vendor in meal_data.keys():
 
@@ -563,9 +628,12 @@ for vendor in meal_data.keys():
         <p>Orders: {best_votes}</p>
 
     </div>
+
     """
 
-best_html += "</div>"
+best_html += """
+</div>
+"""
 
 st.markdown(best_html, unsafe_allow_html=True)
 
@@ -577,21 +645,43 @@ if show_admin:
 
     st.markdown("---")
 
-    st.markdown("## 📊 Admin Dashboard")
+    st.markdown("## Admin Dashboard")
 
     vendor_orders = {}
+    sentiment_scores = {}
+    wastage_data = {}
 
     for vendor, foods in meal_data.items():
 
         total_orders = 0
 
+        all_feedbacks = []
+
         for food in foods:
 
             key = f"{selected_meal}|{vendor}|{food}"
 
-            total_orders += ratings_data[key]["votes"]
+            votes = ratings_data[key]["votes"]
+
+            total_orders += votes
+
+            if "feedbacks" in ratings_data[key]:
+
+                all_feedbacks.extend(
+                    ratings_data[key]["feedbacks"]
+                )
+
+        sentiment = analyze_sentiment(all_feedbacks)
 
         vendor_orders[vendor] = total_orders
+
+        sentiment_scores[vendor] = sentiment
+
+        wastage = max(0, 100 - total_orders)
+
+        wastage_data[vendor] = wastage
+
+    st.markdown("### Vendor Performance")
 
     admin_cols = st.columns(len(vendor_orders))
 
@@ -607,12 +697,16 @@ if show_admin:
 
                 <p><b>Total Orders:</b> {vendor_orders[vendor]}</p>
 
+                <p><b>Customer Sentiment:</b><br>{sentiment_scores[vendor]}</p>
+
+                <p><b>Food Wastage Reduced:</b> {wastage_data[vendor]}%</p>
+
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
-    st.markdown("### Orders Comparison")
+    st.markdown("### Orders Comparison Chart")
 
     chart_data = pd.DataFrame({
         "Orders Served": list(vendor_orders.values())
