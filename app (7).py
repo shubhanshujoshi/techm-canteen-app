@@ -32,32 +32,11 @@ html, body, [class*="css"] {
     font-family: 'Aptos', sans-serif;
 }
 
-/* MAIN APP */
+/* APP */
 
 .stApp {
     background-color: #f5f5f5;
     color: #111111;
-}
-
-/* MOBILE FIX */
-
-@media (max-width: 768px) {
-
-    html, body, [class*="css"] {
-        color: #111111 !important;
-    }
-
-    .main-title {
-        font-size: 28px !important;
-    }
-
-    .sub-title {
-        font-size: 14px !important;
-    }
-
-    .food-card {
-        min-width: 100% !important;
-    }
 }
 
 /* HEADER */
@@ -69,8 +48,21 @@ html, body, [class*="css"] {
 }
 
 .sub-title {
-    color: #444444;
+    color: #555555;
     font-size: 16px;
+}
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+
+    .main-title {
+        font-size: 28px !important;
+    }
+
+    .sub-title {
+        font-size: 14px !important;
+    }
 }
 
 /* SIDEBAR */
@@ -90,7 +82,6 @@ section[data-testid="stSidebar"] {
     padding: 12px;
     font-weight: 600;
     width: 100%;
-    transition: 0.3s;
 }
 
 .stButton > button:hover {
@@ -112,41 +103,42 @@ section[data-testid="stSidebar"] {
 
     box-shadow:
     0px 4px 14px rgba(0,0,0,0.08);
+
+    margin-bottom: 10px;
 }
 
-/* HORIZONTAL SWIPE */
+/* HORIZONTAL SCROLL */
 
-.horizontal-scroll {
-
-    display: flex;
+.scroll-container {
 
     overflow-x: auto;
-    overflow-y: hidden;
+    white-space: nowrap;
 
-    gap: 16px;
+    padding-bottom: 10px;
 
-    padding: 10px 5px;
-
-    scroll-behavior: smooth;
-
-    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
 }
 
-/* HIDE SCROLLBAR */
-
-.horizontal-scroll::-webkit-scrollbar {
+.scroll-container::-webkit-scrollbar {
     display: none;
 }
 
-/* SWIPE CARDS */
+.scroll-item {
 
-.top-card,
-.best-card {
+    display: inline-block;
 
-    min-width: 250px;
-    max-width: 250px;
+    width: 260px;
 
-    flex-shrink: 0;
+    margin-right: 16px;
+
+    vertical-align: top;
+}
+
+/* FEEDBACK */
+
+[data-testid="stFeedback"] button {
+    transform: scale(1.4);
+    margin-right: 10px;
 }
 
 /* TABS */
@@ -162,14 +154,7 @@ section[data-testid="stSidebar"] {
     border-radius: 10px;
 }
 
-/* FEEDBACK */
-
-[data-testid="stFeedback"] button {
-    transform: scale(1.5);
-    margin-right: 10px;
-}
-
-/* FOOTER */
+/* HIDE STREAMLIT */
 
 footer {
     visibility: hidden;
@@ -281,9 +266,6 @@ def load_data():
 
                 fresh_data[key].update(existing_data[key])
 
-                if "feedbacks" not in fresh_data[key]:
-                    fresh_data[key]["feedbacks"] = []
-
     except:
         fresh_data = initialize_ratings()
 
@@ -297,53 +279,6 @@ def save_data(data):
 
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
-
-# ---------------------------------------------------
-# SENTIMENT ANALYSIS
-# ---------------------------------------------------
-
-def analyze_sentiment(feedbacks):
-
-    if not feedbacks:
-        return "Neutral"
-
-    positive_words = [
-        "good", "great", "excellent", "amazing",
-        "awesome", "tasty", "love", "nice",
-        "best", "fresh", "fantastic", "delicious"
-    ]
-
-    negative_words = [
-        "bad", "worst", "cold", "stale",
-        "awful", "hate", "poor", "dirty",
-        "disgusting", "late", "waste"
-    ]
-
-    positive_count = 0
-    negative_count = 0
-
-    for feedback in feedbacks:
-
-        feedback = feedback.lower()
-
-        for word in positive_words:
-
-            if word in feedback:
-                positive_count += 1
-
-        for word in negative_words:
-
-            if word in feedback:
-                negative_count += 1
-
-    if positive_count > negative_count:
-        return "Positive"
-
-    elif negative_count > positive_count:
-        return "Negative"
-
-    else:
-        return "Neutral"
 
 ratings_data = load_data()
 
@@ -456,44 +391,31 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-cards_html = """
-<div class="horizontal-scroll">
-"""
+scroll_html = '<div class="scroll-container">'
 
 for idx, dish in enumerate(top_dishes):
 
     stars = "★" * int(round(dish["Rating"]))
 
-    cards_html += f"""
-
-    <div class="top-card">
-
-        <h3>{idx+1}. {dish['Food']}</h3>
-
-        <p><b>{dish['Vendor']}</b></p>
-
-        <p style="font-size:22px; color:#D9232D;">
-            {stars}
-        </p>
-
-        <p>
-            <b>{dish['Rating']}/5</b>
-        </p>
-
+    scroll_html += f'''
+    <div class="scroll-item">
+        <div class="top-card">
+            <h3>{idx+1}. {dish["Food"]}</h3>
+            <p><b>{dish["Vendor"]}</b></p>
+            <p style="font-size:22px; color:#D9232D;">{stars}</p>
+            <p><b>{dish["Rating"]}/5</b></p>
+        </div>
     </div>
+    '''
 
-    """
+scroll_html += '</div>'
 
-cards_html += """
-</div>
-"""
-
-st.markdown(cards_html, unsafe_allow_html=True)
+st.components.v1.html(scroll_html, height=250)
 
 st.markdown("---")
 
 # ---------------------------------------------------
-# RATE FOOD SECTION
+# RATE FOOD
 # ---------------------------------------------------
 
 st.markdown("## Rate Food Item")
@@ -547,7 +469,6 @@ for tab, vendor in zip(tabs, vendors):
 
         user_text = st.text_area(
             "Optional Feedback",
-            placeholder="Write your feedback here...",
             key=f"text_{key}"
         )
 
@@ -583,14 +504,12 @@ for tab, vendor in zip(tabs, vendors):
 st.markdown("---")
 
 # ---------------------------------------------------
-# BEST SELLING DISHES
+# BEST SELLING
 # ---------------------------------------------------
 
 st.markdown("## Best Selling Dish Of Each Vendor")
 
-best_html = """
-<div class="horizontal-scroll">
-"""
+best_html = '<div class="scroll-container">'
 
 for vendor in meal_data.keys():
 
@@ -615,27 +534,20 @@ for vendor in meal_data.keys():
             best_food = food
             best_rating = round(avg,1)
 
-    best_html += f"""
-
-    <div class="best-card">
-
-        <h4>{vendor}</h4>
-
-        <p><b>{best_food}</b></p>
-
-        <p>Rating: {best_rating}/5</p>
-
-        <p>Orders: {best_votes}</p>
-
+    best_html += f'''
+    <div class="scroll-item">
+        <div class="best-card">
+            <h4>{vendor}</h4>
+            <p><b>{best_food}</b></p>
+            <p>Rating: {best_rating}/5</p>
+            <p>Orders: {best_votes}</p>
+        </div>
     </div>
+    '''
 
-    """
+best_html += '</div>'
 
-best_html += """
-</div>
-"""
-
-st.markdown(best_html, unsafe_allow_html=True)
+st.components.v1.html(best_html, height=220)
 
 # ---------------------------------------------------
 # ADMIN DASHBOARD
@@ -648,40 +560,18 @@ if show_admin:
     st.markdown("## Admin Dashboard")
 
     vendor_orders = {}
-    sentiment_scores = {}
-    wastage_data = {}
 
     for vendor, foods in meal_data.items():
 
         total_orders = 0
 
-        all_feedbacks = []
-
         for food in foods:
 
             key = f"{selected_meal}|{vendor}|{food}"
 
-            votes = ratings_data[key]["votes"]
-
-            total_orders += votes
-
-            if "feedbacks" in ratings_data[key]:
-
-                all_feedbacks.extend(
-                    ratings_data[key]["feedbacks"]
-                )
-
-        sentiment = analyze_sentiment(all_feedbacks)
+            total_orders += ratings_data[key]["votes"]
 
         vendor_orders[vendor] = total_orders
-
-        sentiment_scores[vendor] = sentiment
-
-        wastage = max(0, 100 - total_orders)
-
-        wastage_data[vendor] = wastage
-
-    st.markdown("### Vendor Performance")
 
     admin_cols = st.columns(len(vendor_orders))
 
@@ -697,16 +587,10 @@ if show_admin:
 
                 <p><b>Total Orders:</b> {vendor_orders[vendor]}</p>
 
-                <p><b>Customer Sentiment:</b><br>{sentiment_scores[vendor]}</p>
-
-                <p><b>Food Wastage Reduced:</b> {wastage_data[vendor]}%</p>
-
                 </div>
                 """,
                 unsafe_allow_html=True
             )
-
-    st.markdown("### Orders Comparison Chart")
 
     chart_data = pd.DataFrame({
         "Orders Served": list(vendor_orders.values())
