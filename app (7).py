@@ -32,7 +32,7 @@ html, body, [class*="css"] {
     font-family: 'Aptos', sans-serif;
 }
 
-/* APP */
+/* MAIN APP */
 
 .stApp {
     background-color: #f5f5f5;
@@ -63,6 +63,7 @@ html, body, [class*="css"] {
     .sub-title {
         font-size: 14px !important;
     }
+
 }
 
 /* SIDEBAR */
@@ -82,6 +83,7 @@ section[data-testid="stSidebar"] {
     padding: 12px;
     font-weight: 600;
     width: 100%;
+    transition: 0.3s;
 }
 
 .stButton > button:hover {
@@ -96,7 +98,7 @@ section[data-testid="stSidebar"] {
 .admin-card {
 
     background: white;
-    padding: 20px;
+    padding: 22px;
     border-radius: 18px;
 
     border-left: 6px solid #D9232D;
@@ -104,34 +106,41 @@ section[data-testid="stSidebar"] {
     box-shadow:
     0px 4px 14px rgba(0,0,0,0.08);
 
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
-/* HORIZONTAL SCROLL */
+/* SWIPE SECTION */
 
-.scroll-container {
+.swipe-container {
+
+    display: flex;
 
     overflow-x: auto;
-    white-space: nowrap;
+    overflow-y: hidden;
 
-    padding-bottom: 10px;
+    gap: 18px;
 
-    scrollbar-width: none;
+    padding-bottom: 12px;
+
+    scroll-behavior: smooth;
+
+    -webkit-overflow-scrolling: touch;
 }
 
-.scroll-container::-webkit-scrollbar {
+/* HIDE SCROLLBAR */
+
+.swipe-container::-webkit-scrollbar {
     display: none;
 }
 
-.scroll-item {
+/* SWIPE CARD */
 
-    display: inline-block;
+.swipe-card {
 
-    width: 260px;
+    min-width: 260px;
+    max-width: 260px;
 
-    margin-right: 16px;
-
-    vertical-align: top;
+    flex-shrink: 0;
 }
 
 /* FEEDBACK */
@@ -154,7 +163,7 @@ section[data-testid="stSidebar"] {
     border-radius: 10px;
 }
 
-/* HIDE STREAMLIT */
+/* FOOTER */
 
 footer {
     visibility: hidden;
@@ -235,7 +244,8 @@ def initialize_ratings():
                 ratings[key] = {
                     "total_rating": 0,
                     "votes": 0,
-                    "feedbacks": []
+                    "feedbacks": [],
+                    "positive_votes": 0
                 }
 
     return ratings
@@ -263,7 +273,6 @@ def load_data():
         for key in existing_data:
 
             if key in fresh_data:
-
                 fresh_data[key].update(existing_data[key])
 
     except:
@@ -279,6 +288,53 @@ def save_data(data):
 
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
+
+# ---------------------------------------------------
+# SENTIMENT ANALYSIS
+# ---------------------------------------------------
+
+def analyze_sentiment(feedbacks):
+
+    if not feedbacks:
+        return "Neutral"
+
+    positive_words = [
+        "good", "great", "excellent", "amazing",
+        "awesome", "tasty", "love", "nice",
+        "best", "fresh", "fantastic", "delicious"
+    ]
+
+    negative_words = [
+        "bad", "worst", "cold", "stale",
+        "awful", "hate", "poor", "dirty",
+        "disgusting", "late", "waste"
+    ]
+
+    positive_count = 0
+    negative_count = 0
+
+    for feedback in feedbacks:
+
+        feedback = feedback.lower()
+
+        for word in positive_words:
+
+            if word in feedback:
+                positive_count += 1
+
+        for word in negative_words:
+
+            if word in feedback:
+                negative_count += 1
+
+    if positive_count > negative_count:
+        return "Positive"
+
+    elif negative_count > positive_count:
+        return "Negative"
+
+    else:
+        return "Neutral"
 
 ratings_data = load_data()
 
@@ -310,7 +366,7 @@ auto_meal = get_current_meal()
 
 st.sidebar.title("Admin Controls")
 
-show_admin = st.sidebar.toggle("Show Admin Dashboard")
+show_admin = st.sidebar.button("Admin View")
 
 if st.sidebar.button("Reset All Ratings"):
 
@@ -318,7 +374,7 @@ if st.sidebar.button("Reset All Ratings"):
 
     save_data(ratings_data)
 
-    st.sidebar.success("Ratings Reset Successfully")
+    st.sidebar.success("All Ratings Reset Successfully")
 
     st.rerun()
 
@@ -337,7 +393,7 @@ meal_data = default_data[selected_meal]
 col1, col2 = st.columns([1,7])
 
 with col1:
-    st.image("logo.png", width=90)
+    st.image("logo.png", width=85)
 
 with col2:
 
@@ -391,31 +447,43 @@ top_dishes = sorted(
     reverse=True
 )[:5]
 
-scroll_html = '<div class="scroll-container">'
+top_html = """
+<div class="swipe-container">
+"""
 
 for idx, dish in enumerate(top_dishes):
 
     stars = "★" * int(round(dish["Rating"]))
 
-    scroll_html += f'''
-    <div class="scroll-item">
+    top_html += f"""
+
+    <div class="swipe-card">
+
         <div class="top-card">
-            <h3>{idx+1}. {dish["Food"]}</h3>
-            <p><b>{dish["Vendor"]}</b></p>
-            <p style="font-size:22px; color:#D9232D;">{stars}</p>
-            <p><b>{dish["Rating"]}/5</b></p>
+
+            <h3>{idx+1}. {dish['Food']}</h3>
+
+            <p><b>{dish['Vendor']}</b></p>
+
+            <p style="font-size:22px; color:#D9232D;">
+            {stars}
+            </p>
+
+            <p><b>{dish['Rating']}/5</b></p>
+
         </div>
+
     </div>
-    '''
+    """
 
-scroll_html += '</div>'
+top_html += "</div>"
 
-st.components.v1.html(scroll_html, height=250)
+st.components.v1.html(top_html, height=260)
 
 st.markdown("---")
 
 # ---------------------------------------------------
-# RATE FOOD
+# RATE FOOD SECTION
 # ---------------------------------------------------
 
 st.markdown("## Rate Food Item")
@@ -445,6 +513,10 @@ for tab, vendor in zip(tabs, vendors):
             if votes > 0 else 0
         )
 
+        sentiment = analyze_sentiment(
+            ratings_data[key]["feedbacks"]
+        )
+
         st.markdown(
             f"""
             <div class="food-card">
@@ -456,6 +528,8 @@ for tab, vendor in zip(tabs, vendors):
             <p><b>Rating:</b> {round(avg,1)}/5</p>
 
             <p><b>Total Orders:</b> {votes}</p>
+
+            <p><b>Sentiment:</b> {sentiment}</p>
 
             </div>
             """,
@@ -469,6 +543,7 @@ for tab, vendor in zip(tabs, vendors):
 
         user_text = st.text_area(
             "Optional Feedback",
+            placeholder="Write your feedback here...",
             key=f"text_{key}"
         )
 
@@ -484,6 +559,9 @@ for tab, vendor in zip(tabs, vendors):
                 )
 
                 ratings_data[key]["votes"] += 1
+
+                if user_rating >= 3:
+                    ratings_data[key]["positive_votes"] += 1
 
                 if user_text.strip() != "":
 
@@ -504,12 +582,14 @@ for tab, vendor in zip(tabs, vendors):
 st.markdown("---")
 
 # ---------------------------------------------------
-# BEST SELLING
+# BEST SELLING DISHES
 # ---------------------------------------------------
 
 st.markdown("## Best Selling Dish Of Each Vendor")
 
-best_html = '<div class="scroll-container">'
+best_html = """
+<div class="swipe-container">
+"""
 
 for vendor in meal_data.keys():
 
@@ -534,20 +614,28 @@ for vendor in meal_data.keys():
             best_food = food
             best_rating = round(avg,1)
 
-    best_html += f'''
-    <div class="scroll-item">
+    best_html += f"""
+
+    <div class="swipe-card">
+
         <div class="best-card">
+
             <h4>{vendor}</h4>
+
             <p><b>{best_food}</b></p>
+
             <p>Rating: {best_rating}/5</p>
+
             <p>Orders: {best_votes}</p>
+
         </div>
+
     </div>
-    '''
+    """
 
-best_html += '</div>'
+best_html += "</div>"
 
-st.components.v1.html(best_html, height=220)
+st.components.v1.html(best_html, height=240)
 
 # ---------------------------------------------------
 # ADMIN DASHBOARD
@@ -559,23 +647,45 @@ if show_admin:
 
     st.markdown("## Admin Dashboard")
 
+    vendor_ratings = {}
+    vendor_satisfaction = {}
     vendor_orders = {}
 
     for vendor, foods in meal_data.items():
 
-        total_orders = 0
+        total_rating = 0
+        total_votes = 0
+        positive_votes = 0
 
         for food in foods:
 
             key = f"{selected_meal}|{vendor}|{food}"
 
-            total_orders += ratings_data[key]["votes"]
+            total_rating += ratings_data[key]["total_rating"]
 
-        vendor_orders[vendor] = total_orders
+            total_votes += ratings_data[key]["votes"]
 
-    admin_cols = st.columns(len(vendor_orders))
+            positive_votes += ratings_data[key]["positive_votes"]
 
-    for idx, vendor in enumerate(vendor_orders):
+        avg_rating = (
+            round(total_rating / total_votes, 1)
+            if total_votes > 0 else 0
+        )
+
+        satisfaction = (
+            round((positive_votes / total_votes) * 100, 1)
+            if total_votes > 0 else 0
+        )
+
+        vendor_ratings[vendor] = avg_rating
+        vendor_satisfaction[vendor] = satisfaction
+        vendor_orders[vendor] = total_votes
+
+    st.markdown("### Vendor Performance")
+
+    admin_cols = st.columns(len(vendor_ratings))
+
+    for idx, vendor in enumerate(vendor_ratings):
 
         with admin_cols[idx]:
 
@@ -585,6 +695,10 @@ if show_admin:
 
                 <h4>{vendor}</h4>
 
+                <p><b>Average Rating:</b> {vendor_ratings[vendor]}/5</p>
+
+                <p><b>Customer Satisfaction:</b> {vendor_satisfaction[vendor]}%</p>
+
                 <p><b>Total Orders:</b> {vendor_orders[vendor]}</p>
 
                 </div>
@@ -592,11 +706,13 @@ if show_admin:
                 unsafe_allow_html=True
             )
 
+    st.markdown("### Orders Served By Vendors")
+
     chart_data = pd.DataFrame({
         "Orders Served": list(vendor_orders.values())
     }, index=list(vendor_orders.keys()))
 
-    st.bar_chart(chart_data)
+    st.line_chart(chart_data)
 
 # ---------------------------------------------------
 # FOOTER
