@@ -340,7 +340,7 @@ st.markdown("---")
 # MAIN PAGE CONTROLS (Moved from Sidebar)
 # ---------------------------------------------------
 
-st.markdown("### ⚙️ Control Panel")
+st.markdown("### Control Panel")
 
 ctrl_col1, ctrl_col2, ctrl_col3 = st.columns([1, 1, 1])
 
@@ -353,7 +353,7 @@ with ctrl_col1:
 
 with ctrl_col2:
     st.markdown("<br>", unsafe_allow_html=True) # Adding spacing to align with selectbox
-    show_admin = st.toggle("📊 Show Admin Dashboard")
+    show_admin = st.toggle("Show Admin Dashboard")
 
 with ctrl_col3:
     st.markdown("<br>", unsafe_allow_html=True) # Adding spacing to align with selectbox
