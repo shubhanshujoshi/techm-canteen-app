@@ -15,7 +15,7 @@ import base64
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
-    page_icon="🍽️",
+    page_icon="logo.png",
     layout="wide"
 )
 
@@ -359,7 +359,7 @@ st.markdown("---")
 # MAIN PAGE CONTROLS
 # ---------------------------------------------------
 
-st.markdown("### ⚙️ Control Panel")
+st.markdown("### Control Panel")
 
 ctrl_col1, ctrl_col2, ctrl_col3 = st.columns([1, 1, 1])
 
@@ -372,11 +372,11 @@ with ctrl_col1:
 
 with ctrl_col2:
     st.markdown("<br>", unsafe_allow_html=True) 
-    show_admin = st.toggle("📊 Show Admin Dashboard")
+    show_admin = st.toggle("Show Admin Dashboard")
 
 with ctrl_col3:
     st.markdown("<br>", unsafe_allow_html=True) 
-    if st.button("⚠️ Reset All Data & Inputs"):
+    if st.button("Reset All Data & Inputs"):
         ratings_data = initialize_ratings()
         save_data(ratings_data)
         
@@ -533,7 +533,7 @@ st.markdown(best_scroll_html, unsafe_allow_html=True)
 
 if show_admin:
     st.markdown("---")
-    st.markdown("## 📊 Admin Dashboard")
+    st.markdown("## Admin Dashboard")
 
     vendor_orders = {}
     vendor_avg_ratings = {}
