@@ -7,6 +7,7 @@ from datetime import datetime
 import json
 import os
 import pandas as pd
+import base64
 
 # ---------------------------------------------------
 # PAGE CONFIG
@@ -42,14 +43,15 @@ html, body, [class*="css"] {
     font-size: 42px;
     font-weight: 700;
     color: #D9232D;
-    text-align: center; /* Center aligned */
+    text-align: center;
+    margin-top: 10px;
 }
 
 .sub-title {
     color: #555555;
     font-size: 16px;
-    text-align: center; /* Center aligned */
-    margin-bottom: 10px;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 /* BUTTONS */
@@ -217,7 +219,7 @@ def initialize_ratings():
                 ratings[key] = {
                     "total_rating": 0,
                     "votes": 0,
-                    "high_ratings": 0, # Tracks 4 and 5 star ratings
+                    "high_ratings": 0, 
                     "feedbacks": []
                 }
     return ratings
@@ -316,14 +318,21 @@ def get_current_meal():
 auto_meal = get_current_meal()
 
 # ---------------------------------------------------
-# HEADER & LOGO
+# HEADER & RESPONSIVE LOGO
 # ---------------------------------------------------
 
-# Center the logo using column layout
-logo_col1, logo_col2, logo_col3 = st.columns([4, 1, 4])
-with logo_col2:
-    if os.path.exists("logo.png"):
-        st.image("logo.png", use_container_width=True)
+# Robust Base64 Image Rendering for absolute control over mobile sizing
+if os.path.exists("logo.png"):
+    with open("logo.png", "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode()
+    st.markdown(
+        f"""
+        <div style="text-align: center; margin-top: 10px;">
+            <img src="data:image/png;base64,{encoded_string}" style="max-width: 100px; width: 100%; height: auto;">
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 st.markdown(
     """
@@ -553,8 +562,7 @@ if show_admin:
         vendor_orders[vendor] = total_orders
         total_system_orders += total_orders
 
-    # Mock calculations for wastage metrics based on orders (can be replaced with real backend logic later)
-    # Assumes base stock of 50 per vendor over actual orders, and preventative measures saving 15%
+    # Mock calculations for wastage metrics based on orders
     simulated_wastage_kg = max(0, ((len(vendors) * 50) - total_system_orders) * 0.2) 
     simulated_prevented_kg = total_system_orders * 0.15 
 
