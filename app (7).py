@@ -357,7 +357,7 @@ with ctrl_col2:
 
 with ctrl_col3:
     st.markdown("<br>", unsafe_allow_html=True) # Adding spacing to align with selectbox
-    if st.button("⚠️ Reset All Data & Inputs"):
+    if st.button("Reset All Data & Inputs"):
         ratings_data = initialize_ratings()
         save_data(ratings_data)
         
