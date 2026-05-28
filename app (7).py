@@ -15,7 +15,7 @@ import base64
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
-    page_icon="logo.png",
+    page_icon="🍽️",
     layout="wide"
 )
 
@@ -27,9 +27,10 @@ st.markdown("""
 <style>
 
 @import url('https://fonts.cdnfonts.com/css/aptos');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 html, body, [class*="css"] {
-    font-family: 'Aptos', sans-serif !important;
+    font-family: 'Aptos', 'Poppins', sans-serif !important;
 }
 
 .stApp {
@@ -358,7 +359,7 @@ st.markdown("---")
 # MAIN PAGE CONTROLS
 # ---------------------------------------------------
 
-st.markdown("### Control Panel")
+st.markdown("### ⚙️ Control Panel")
 
 ctrl_col1, ctrl_col2, ctrl_col3 = st.columns([1, 1, 1])
 
@@ -371,11 +372,11 @@ with ctrl_col1:
 
 with ctrl_col2:
     st.markdown("<br>", unsafe_allow_html=True) 
-    show_admin = st.toggle("Show Admin Dashboard")
+    show_admin = st.toggle("📊 Show Admin Dashboard")
 
 with ctrl_col3:
     st.markdown("<br>", unsafe_allow_html=True) 
-    if st.button("Reset All Data & Inputs"):
+    if st.button("⚠️ Reset All Data & Inputs"):
         ratings_data = initialize_ratings()
         save_data(ratings_data)
         
@@ -532,7 +533,7 @@ st.markdown(best_scroll_html, unsafe_allow_html=True)
 
 if show_admin:
     st.markdown("---")
-    st.markdown("## Admin Dashboard")
+    st.markdown("## 📊 Admin Dashboard")
 
     vendor_orders = {}
     vendor_avg_ratings = {}
