@@ -14,7 +14,7 @@ import pandas as pd
 
 st.set_page_config(
     page_title="Tech Mahindra Smart Canteen",
-    page_icon="logo.png",
+    page_icon="🍽️",
     layout="wide"
 )
 
@@ -42,11 +42,14 @@ html, body, [class*="css"] {
     font-size: 42px;
     font-weight: 700;
     color: #D9232D;
+    text-align: center; /* Center aligned */
 }
 
 .sub-title {
     color: #555555;
     font-size: 16px;
+    text-align: center; /* Center aligned */
+    margin-bottom: 10px;
 }
 
 /* BUTTONS */
@@ -313,8 +316,14 @@ def get_current_meal():
 auto_meal = get_current_meal()
 
 # ---------------------------------------------------
-# HEADER
+# HEADER & LOGO
 # ---------------------------------------------------
+
+# Center the logo using column layout
+logo_col1, logo_col2, logo_col3 = st.columns([4, 1, 4])
+with logo_col2:
+    if os.path.exists("logo.png"):
+        st.image("logo.png", use_container_width=True)
 
 st.markdown(
     """
@@ -337,10 +346,10 @@ st.markdown(
 st.markdown("---")
 
 # ---------------------------------------------------
-# MAIN PAGE CONTROLS (Moved from Sidebar)
+# MAIN PAGE CONTROLS
 # ---------------------------------------------------
 
-st.markdown("### Control Panel")
+st.markdown("### ⚙️ Control Panel")
 
 ctrl_col1, ctrl_col2, ctrl_col3 = st.columns([1, 1, 1])
 
@@ -352,16 +361,15 @@ with ctrl_col1:
     )
 
 with ctrl_col2:
-    st.markdown("<br>", unsafe_allow_html=True) # Adding spacing to align with selectbox
-    show_admin = st.toggle("Show Admin Dashboard")
+    st.markdown("<br>", unsafe_allow_html=True) 
+    show_admin = st.toggle("📊 Show Admin Dashboard")
 
 with ctrl_col3:
-    st.markdown("<br>", unsafe_allow_html=True) # Adding spacing to align with selectbox
-    if st.button("Reset All Data & Inputs"):
+    st.markdown("<br>", unsafe_allow_html=True) 
+    if st.button("⚠️ Reset All Data & Inputs"):
         ratings_data = initialize_ratings()
         save_data(ratings_data)
         
-        # Clear session state so UI inputs actually clear
         for key in st.session_state.keys():
             if key.startswith('feedback_') or key.startswith('text_') or key.endswith('_food'):
                 del st.session_state[key]
