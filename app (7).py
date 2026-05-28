@@ -532,7 +532,7 @@ st.markdown(best_scroll_html, unsafe_allow_html=True)
 
 if show_admin:
     st.markdown("---")
-    st.markdown("## 📊 Admin Dashboard")
+    st.markdown("## Admin Dashboard")
 
     vendor_orders = {}
     vendor_avg_ratings = {}
